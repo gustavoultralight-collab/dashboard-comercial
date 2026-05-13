@@ -3,424 +3,499 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
   <title>Comercial Ultralight</title>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
     }
 
-    body {
-      background: #050505;
-      color: white;
-      overflow: hidden;
-      transition: 0.4s;
+    body{
+      background:#050505;
+      color:white;
+      overflow:hidden;
+      transition:0.4s;
     }
 
-    .container {
-      display: flex;
-      height: 100vh;
-      padding: 25px;
-      gap: 25px;
+    .container{
+      display:flex;
+      height:100vh;
+      padding:25px;
+      gap:25px;
     }
 
     .left,
-    .right {
-      width: 24%;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    .right{
+      width:24%;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
     }
 
-    .center {
-      flex: 1;
-      background: #0d0d0d;
-      border: 2px solid #222;
-      border-radius: 25px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
+    .center{
+      flex:1;
+      background:#0d0d0d;
+      border:2px solid #222;
+      border-radius:25px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
     }
 
-    .card {
-      background: #0d0d0d;
-      border: 2px solid #222;
-      border-radius: 20px;
-      padding: 25px;
+    .card{
+      background:#0d0d0d;
+      border:2px solid #222;
+      border-radius:20px;
+      padding:25px;
     }
 
-    .card h2 {
-      margin-bottom: 20px;
-      font-size: 28px;
+    .card h2{
+      margin-bottom:20px;
+      font-size:28px;
     }
 
-    .ranking-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      background: rgba(255,255,255,0.04);
-      font-size: 22px;
+    .ranking-item{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px;
+      border-radius:12px;
+      margin-bottom:10px;
+      background:rgba(255,255,255,0.04);
+      font-size:22px;
     }
 
-    .title {
-      font-size: 28px;
-      color: #777;
-      margin-bottom: 20px;
+    .title{
+      font-size:28px;
+      color:#777;
+      margin-bottom:20px;
     }
 
-    .timer {
-      font-size: 130px;
-      font-weight: bold;
-      color: #00ff95;
-      transition: 0.3s;
+    .timer{
+      font-size:140px;
+      font-weight:bold;
+      color:#00ff95;
+      transition:0.3s;
     }
 
-    .alert {
-      color: red !important;
-      animation: piscar 1s infinite;
+    .alert{
+      color:red !important;
+      animation:piscar 1s infinite;
     }
 
-    @keyframes piscar {
-      0% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.3;
-      }
-
-      100% {
-        opacity: 1;
-      }
+    @keyframes piscar{
+      0%{opacity:1;}
+      50%{opacity:0.3;}
+      100%{opacity:1;}
     }
 
-    .message {
-      position: absolute;
-      bottom: 40px;
-      font-size: 32px;
-      color: #999;
-      text-align: center;
-      width: 100%;
-      padding: 0 20px;
+    .message{
+      position:absolute;
+      bottom:40px;
+      font-size:32px;
+      color:#999;
+      text-align:center;
+      width:100%;
+      padding:0 20px;
     }
 
-    .meta {
-      font-size: 60px;
-      color: #00ff95;
-      font-weight: bold;
+    .meta{
+      font-size:60px;
+      color:#00ff95;
+      font-weight:bold;
     }
 
-    .buttons {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      z-index: 999;
+    .buttons{
+      position:fixed;
+      bottom:10px;
+      left:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      z-index:999;
+      max-width:95%;
     }
 
-    button {
-      padding: 12px 18px;
-      border: none;
-      border-radius: 10px;
-      background: #00ff95;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
+    button{
+      padding:12px 18px;
+      border:none;
+      border-radius:10px;
+      background:#00ff95;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.2s;
+      font-size:15px;
     }
 
-    button:hover {
-      transform: scale(1.03);
+    button:hover{
+      transform:scale(1.03);
     }
 
-    .danger {
-      background: red;
-      color: white;
+    .danger{
+      background:red;
+      color:white;
     }
 
-    hr {
-      border-color: #222;
-      margin: 20px 0;
+    .warning{
+      background:#ffae00;
+      color:black;
     }
+
+    hr{
+      border-color:#222;
+      margin:20px 0;
+    }
+
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <div class="left">
+  <div class="left">
 
-      <div class="card">
+    <div class="card">
 
-        <h2>🏆 Ranking Diário</h2>
+      <h2>🏆 Ranking Diário</h2>
 
-        <div id="rankingDiario"></div>
+      <div id="rankingDiario"></div>
 
-        <hr>
+      <hr>
 
-        <h2>📅 Ranking Mensal</h2>
+      <h2>📅 Ranking Mensal</h2>
 
-        <div id="rankingMensal"></div>
-
-      </div>
-
-    </div>
-
-    <div class="center">
-
-      <div class="title">
-        TEMPO SEM LIGAÇÃO
-      </div>
-
-      <div class="timer" id="timer">
-        00:00
-      </div>
-
-      <div class="message" id="message">
-        Os clientes não vão ligar sozinhos.
-      </div>
-
-    </div>
-
-    <div class="right">
-
-      <div class="card">
-        <h2>📞 Ligações Hoje</h2>
-        <div class="meta" id="totalLigacoes">0</div>
-      </div>
-
-      <div class="card">
-        <h2>🎯 Meta</h2>
-        <div class="meta">50</div>
-      </div>
-
-      <div class="card">
-        <h2>💰 Vendas</h2>
-        <div class="meta" id="vendas">0</div>
-      </div>
+      <div id="rankingMensal"></div>
 
     </div>
 
   </div>
 
-  <div class="buttons">
+  <div class="center">
 
-    <button onclick="addLigacao('Solange')">+1 Solange</button>
+    <div class="title">
+      TEMPO SEM LIGAÇÃO
+    </div>
 
-    <button onclick="addLigacao('Lucas')">+1 Lucas</button>
+    <div class="timer" id="timer">
+      00:00
+    </div>
 
-    <button onclick="addLigacao('Patrick')">+1 Patrick</button>
-
-    <button onclick="addLigacao('Bruna')">+1 Bruna</button>
-
-    <button onclick="addLigacao('Nayara')">+1 Nayara</button>
-
-    <button class="danger" onclick="resetTimer()">
-      Zerar Cronômetro
-    </button>
-
-    <button class="danger" onclick="resetRanking()">
-      Zerar Ranking Diário
-    </button>
-
-    <button class="danger" onclick="resetMensal()">
-      Zerar Ranking Mensal
-    </button>
+    <div class="message" id="message">
+      Os clientes não vão ligar sozinhos.
+    </div>
 
   </div>
 
-  <audio id="alertSound">
-    <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
-  </audio>
+  <div class="right">
 
-  <script>
+    <div class="card">
+      <h2>📞 Ligações Hoje</h2>
+      <div class="meta" id="totalLigacoes">0</div>
+    </div>
 
-    let segundos = 0;
+    <div class="card">
+      <h2>🎯 Meta</h2>
+      <div class="meta">50</div>
+    </div>
 
-    let frases = [
-      "Doeu ligar para o cliente?",
-      "O telefone não morde.",
-      "Os clientes não vão ligar sozinhos.",
-      "Silêncio demais pra equipe comercial.",
-      "A meta não bate sozinha.",
-      "Call center ou biblioteca?",
-      "Mais uma ligação = mais chance de venda.",
-      "O teclado não fecha venda."
-    ];
+    <div class="card">
+      <h2>💰 Vendas</h2>
+      <div class="meta" id="vendas">0</div>
+    </div>
 
-    let vendedores = {
-      "Solange": {
-        diario: 0,
-        mensal: 0
-      },
-      "Lucas": {
-        diario: 0,
-        mensal: 0
-      },
-      "Patrick": {
-        diario: 0,
-        mensal: 0
-      },
-      "Bruna": {
-        diario: 0,
-        mensal: 0
-      },
-      "Nayara": {
-        diario: 0,
-        mensal: 0
-      }
-    };
+  </div>
 
-    let totalLigacoes = 0;
+</div>
 
-    function atualizarTimer() {
+<div class="buttons">
 
-      segundos++;
+  <button onclick="addLigacao('Solange')">
+    +1 Solange
+  </button>
 
-      let min = Math.floor(segundos / 60);
-      let sec = segundos % 60;
+  <button onclick="addLigacao('Lucas')">
+    +1 Lucas
+  </button>
 
-      if (min < 10) min = "0" + min;
-      if (sec < 10) sec = "0" + sec;
+  <button onclick="addLigacao('Patrick')">
+    +1 Patrick
+  </button>
 
-      document.getElementById("timer").innerText = `${min}:${sec}`;
+  <button onclick="addLigacao('Bruna')">
+    +1 Bruna
+  </button>
 
-      if (segundos >= 1200) {
+  <button onclick="addLigacao('Nayara')">
+    +1 Nayara
+  </button>
 
-        document.getElementById("timer").classList.add("alert");
+  <button class="warning" onclick="adicionar10Min()">
+    +10 min
+  </button>
 
-        document.body.style.background = "#250000";
+  <button class="warning" onclick="tirar10Min()">
+    -10 min
+  </button>
 
-        document.getElementById("message").innerText =
-          "⚠ SEM LIGAÇÕES HÁ 20 MINUTOS ⚠";
+  <button class="danger" onclick="resetTimer()">
+    Zerar Cronômetro
+  </button>
 
-        document.getElementById("alertSound").play();
+  <button class="danger" onclick="resetRanking()">
+    Zerar Ranking Diário
+  </button>
 
-      }
+  <button class="danger" onclick="resetMensal()">
+    Zerar Ranking Mensal
+  </button>
 
-    }
+</div>
 
-    setInterval(atualizarTimer, 1000);
+<audio id="alertSound">
+  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+</audio>
 
-    function atualizarRanking() {
+<script>
 
-      let diario = Object.entries(vendedores)
-        .sort((a, b) => b[1].diario - a[1].diario);
+let segundos = 0;
 
-      let mensal = Object.entries(vendedores)
-        .sort((a, b) => b[1].mensal - a[1].mensal);
+let frases = [
 
-      let htmlDiario = "";
-      let htmlMensal = "";
+  "Doeu ligar para o cliente?",
+  "O telefone não morde.",
+  "Os clientes não vão ligar sozinhos.",
+  "Silêncio demais pra equipe comercial.",
+  "A meta não bate sozinha.",
+  "Call center ou biblioteca?",
+  "Mais uma ligação = mais chance de venda.",
+  "O teclado não fecha venda.",
+  "Sem ligação sem comissão 👀",
+  "Vendedor raiz gosta de ligação."
 
-      diario.forEach((vendedor, index) => {
+];
 
-        htmlDiario += `
-        <div class="ranking-item">
-          <span>${index + 1}. ${vendedor[0]}</span>
-          <span>${vendedor[1].diario}</span>
-        </div>
-      `;
+let vendedores = {
 
-      });
+  "Solange": {
+    diario:0,
+    mensal:0
+  },
 
-      mensal.forEach((vendedor, index) => {
+  "Lucas": {
+    diario:0,
+    mensal:0
+  },
 
-        htmlMensal += `
-        <div class="ranking-item">
-          <span>${index + 1}. ${vendedor[0]}</span>
-          <span>${vendedor[1].mensal}</span>
-        </div>
-      `;
+  "Patrick": {
+    diario:0,
+    mensal:0
+  },
 
-      });
+  "Bruna": {
+    diario:0,
+    mensal:0
+  },
 
-      document.getElementById("rankingDiario").innerHTML = htmlDiario;
-      document.getElementById("rankingMensal").innerHTML = htmlMensal;
+  "Nayara": {
+    diario:0,
+    mensal:0
+  }
 
-    }
+};
 
-    atualizarRanking();
+let totalLigacoes = 0;
 
-    function fraseAleatoria() {
+function atualizarTimerVisual(){
 
-      let frase = frases[Math.floor(Math.random() * frases.length)];
+  let min = Math.floor(segundos / 60);
+  let sec = segundos % 60;
 
-      document.getElementById("message").innerText = frase;
+  if(min < 10) min = "0" + min;
+  if(sec < 10) sec = "0" + sec;
 
-    }
+  document.getElementById("timer").innerText =
+    `${min}:${sec}`;
 
-    function addLigacao(nome) {
+  if(segundos >= 1200){
 
-      vendedores[nome].diario++;
-      vendedores[nome].mensal++;
+    document.getElementById("timer")
+      .classList.add("alert");
 
-      totalLigacoes++;
+    document.body.style.background = "#250000";
 
-      document.getElementById("totalLigacoes").innerText =
-        totalLigacoes;
+    document.getElementById("message").innerText =
+      "⚠ SEM LIGAÇÕES HÁ 20 MINUTOS ⚠";
 
-      atualizarRanking();
+    document.getElementById("alertSound").play();
 
-      fraseAleatoria();
+  }
 
-      resetTimer();
+  else{
 
-    }
+    document.body.style.background = "#050505";
 
-    function resetTimer() {
+    document.getElementById("timer")
+      .classList.remove("alert");
 
-      segundos = 0;
+  }
 
-      document.body.style.background = "#050505";
+}
 
-      document.getElementById("timer").classList.remove("alert");
+function atualizarTimer(){
 
-    }
+  segundos++;
 
-    function resetRanking() {
+  atualizarTimerVisual();
 
-      for (let nome in vendedores) {
+}
 
-        vendedores[nome].diario = 0;
+setInterval(atualizarTimer,1000);
 
-      }
+function atualizarRanking(){
 
-      totalLigacoes = 0;
+  let diario = Object.entries(vendedores)
+    .sort((a,b) => b[1].diario - a[1].diario);
 
-      document.getElementById("totalLigacoes").innerText = 0;
+  let mensal = Object.entries(vendedores)
+    .sort((a,b) => b[1].mensal - a[1].mensal);
 
-      atualizarRanking();
+  let htmlDiario = "";
+  let htmlMensal = "";
 
-    }
+  diario.forEach((vendedor,index)=>{
 
-    function resetMensal() {
+    htmlDiario += `
 
-      for (let nome in vendedores) {
+      <div class="ranking-item">
+        <span>${index + 1}. ${vendedor[0]}</span>
+        <span>${vendedor[1].diario}</span>
+      </div>
 
-        vendedores[nome].mensal = 0;
+    `;
 
-      }
+  });
 
-      atualizarRanking();
+  mensal.forEach((vendedor,index)=>{
 
-    }
+    htmlMensal += `
 
-  </script>
+      <div class="ranking-item">
+        <span>${index + 1}. ${vendedor[0]}</span>
+        <span>${vendedor[1].mensal}</span>
+      </div>
+
+    `;
+
+  });
+
+  document.getElementById("rankingDiario")
+    .innerHTML = htmlDiario;
+
+  document.getElementById("rankingMensal")
+    .innerHTML = htmlMensal;
+
+}
+
+atualizarRanking();
+
+function fraseAleatoria(){
+
+  let frase =
+    frases[Math.floor(Math.random() * frases.length)];
+
+  document.getElementById("message").innerText =
+    frase;
+
+}
+
+function addLigacao(nome){
+
+  vendedores[nome].diario++;
+  vendedores[nome].mensal++;
+
+  totalLigacoes++;
+
+  document.getElementById("totalLigacoes")
+    .innerText = totalLigacoes;
+
+  atualizarRanking();
+
+  fraseAleatoria();
+
+  resetTimer();
+
+}
+
+function adicionar10Min(){
+
+  segundos += 600;
+
+  atualizarTimerVisual();
+
+}
+
+function tirar10Min(){
+
+  segundos -= 600;
+
+  if(segundos < 0){
+
+    segundos = 0;
+
+  }
+
+  atualizarTimerVisual();
+
+}
+
+function resetTimer(){
+
+  segundos = 0;
+
+  atualizarTimerVisual();
+
+}
+
+function resetRanking(){
+
+  for(let nome in vendedores){
+
+    vendedores[nome].diario = 0;
+
+  }
+
+  totalLigacoes = 0;
+
+  document.getElementById("totalLigacoes")
+    .innerText = 0;
+
+  atualizarRanking();
+
+}
+
+function resetMensal(){
+
+  for(let nome in vendedores){
+
+    vendedores[nome].mensal = 0;
+
+  }
+
+  atualizarRanking();
+
+}
+
+</script>
 
 </body>
-
 </html>
