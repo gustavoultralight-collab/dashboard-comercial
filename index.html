@@ -272,8 +272,6 @@
 
 <script>
 
-let segundos = 0;
-
 let frases = [
 
   "Doeu ligar para o cliente?",
@@ -289,7 +287,7 @@ let frases = [
 
 ];
 
-let vendedores = {
+let vendedores = JSON.parse(localStorage.getItem("vendedores")) || {
 
   "Solange": {
     diario:0,
@@ -318,7 +316,33 @@ let vendedores = {
 
 };
 
-let totalLigacoes = 0;
+let totalLigacoes =
+  parseInt(localStorage.getItem("totalLigacoes")) || 0;
+
+let segundos =
+  parseInt(localStorage.getItem("segundos")) || 0;
+
+document.getElementById("totalLigacoes")
+  .innerText = totalLigacoes;
+
+function salvarDados(){
+
+  localStorage.setItem(
+    "vendedores",
+    JSON.stringify(vendedores)
+  );
+
+  localStorage.setItem(
+    "totalLigacoes",
+    totalLigacoes
+  );
+
+  localStorage.setItem(
+    "segundos",
+    segundos
+  );
+
+}
 
 function atualizarTimerVisual(){
 
@@ -341,8 +365,6 @@ function atualizarTimerVisual(){
     document.getElementById("message").innerText =
       "⚠ SEM LIGAÇÕES HÁ 20 MINUTOS ⚠";
 
-    document.getElementById("alertSound").play();
-
   }
 
   else{
@@ -361,6 +383,8 @@ function atualizarTimer(){
   segundos++;
 
   atualizarTimerVisual();
+
+  salvarDados();
 
 }
 
@@ -412,6 +436,7 @@ function atualizarRanking(){
 }
 
 atualizarRanking();
+atualizarTimerVisual();
 
 function fraseAleatoria(){
 
@@ -439,6 +464,8 @@ function addLigacao(nome){
 
   resetTimer();
 
+  salvarDados();
+
 }
 
 function adicionarTempo(){
@@ -446,6 +473,8 @@ function adicionarTempo(){
   segundos += 60;
 
   atualizarTimerVisual();
+
+  salvarDados();
 
 }
 
@@ -461,6 +490,8 @@ function tirarTempo(){
 
   atualizarTimerVisual();
 
+  salvarDados();
+
 }
 
 function resetTimer(){
@@ -468,6 +499,8 @@ function resetTimer(){
   segundos = 0;
 
   atualizarTimerVisual();
+
+  salvarDados();
 
 }
 
@@ -486,6 +519,8 @@ function resetRanking(){
 
   atualizarRanking();
 
+  salvarDados();
+
 }
 
 function resetMensal(){
@@ -497,6 +532,8 @@ function resetMensal(){
   }
 
   atualizarRanking();
+
+  salvarDados();
 
 }
 
