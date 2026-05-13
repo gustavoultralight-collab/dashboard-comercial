@@ -1,1 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Comercial Ultralight</title>
 
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      background:#050505;
+      color:white;
+      overflow:hidden;
+    }
+
+    .container{
+      display:flex;
+      height:100vh;
+      padding:25px;
+      gap:25px;
+    }
+
+    .left,
+    .right{
+      width:25%;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+
+    .center{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      border:2px solid #222;
+      border-radius:25px;
+      background:#0d0d0d;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .title{
+      font-size:28px;
+      color:#777;
+      margin-bottom:20px;
+    }
+
+    .timer{
+      font-size:120px;
+      font-weight:bold;
+      color:#00ff95;
+    }
+
+    .alert{
+      color:red !important;
+      animation:piscando 1s infinite;
+    }
+
+    @keyframes piscando{
+      0%{opacity:1;}
+      50%{opacity:0.3;}
+      100%{opacity:1;}
+    }
+
+    .card{
+      background:#0d0d0d;
+      border:2px solid #222;
+      border-radius:20px;
+      padding:25px;
+    }
+
+    .card h2{
+      margin-bottom:20px;
+      font-size:28px;
+    }
+
+    .ranking-item{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:15px;
+      font-size:24px;
+    }
+
+    .meta{
+      font-size:60px;
+      color:#00ff95;
+      font-weight:bold;
+    }
+
+    .message{
+      position:absolute;
+      bottom:40px;
+      font-size:32px;
+      color:#999;
+      text-align:center;
+      width:100%;
+    }
+
+    .buttons{
+      position:fixed;
+      bottom:10px;
+      left:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      z-index:999;
+    }
+
+    button{
+      padding:12px 18px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:bold;
+      background:#00ff95;
+    }
+
+    .danger{
+      background:red;
+      color:white;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="left">
+
+    <div class="card">
+      <h2>🏆 Ranking Diário</h2>
+
+      <div class="ranking-item">
+        <span>Solange</span>
+        <span id="solange">0</span>
+      </div>
+
+      <div class="ranking-item">
+        <span>Lucas</span>
+        <span id="lucas">0</span>
+      </div>
+
+      <div class="ranking-item">
+        <span>Patrick</span>
+        <span id="patrick">0</span>
+      </div>
+
+      <div class="ranking-item">
+        <span>Bruna</span>
+        <span id="bruna">0</span>
+      </div>
+
+      <div class="ranking-item">
+        <span>Nayara</span>
+        <span id="nayara">0</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="center">
+
+    <div class="title">
+      TEMPO SEM LIGAÇÃO
+    </div>
+
+    <div class="timer" id="timer">
+      00:00
+    </div>
+
+    <div class="message" id="message">
+      Os clientes não vão ligar sozinhos.
+    </div>
+
+  </div>
+
+  <div class="right">
+
+    <div class="card">
+      <h2>📞 Ligações Hoje</h2>
+      <div class="meta" id="totalLigacoes">0</div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Meta</h2>
+      <div class="meta">50</div>
+    </div>
+
+    <div class="card">
+      <h2>💰 Vendas</h2>
+      <div class="meta" id="vendas">0</div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="buttons">
+
+  <button onclick="addLigacao('solange')">+1 Solange</button>
+  <button onclick="addLigacao('lucas')">+1 Lucas</button>
+  <button onclick="addLigacao('patrick')">+1 Patrick</button>
+  <button onclick="addLigacao('bruna')">+1 Bruna</button>
+  <button onclick="addLigacao('nayara')">+1 Nayara</button>
+
+  <button class="danger" onclick="resetTimer()">Zerar Cronômetro</button>
+
+</div>
+
+<audio id="alertSound">
+  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+</audio>
+
+<script>
+
+let segundos = 0;
+
+let ligacoes = {
+  solange:0,
+  lucas:0,
+  patrick:0,
+  bruna:0,
+  nayara:0
+};
+
+let totalLigacoes = 0;
+
+function atualizarTimer(){
+
+  segundos++;
+
+  let min = Math.floor(segundos / 60);
+  let sec = segundos % 60;
+
+  if(min < 10) min = "0" + min;
+  if(sec < 10) sec = "0" + sec;
+
+  document.getElementById("timer").innerText = `${min}:${sec}`;
+
+  if(segundos >= 1200){
+
+    document.getElementById("timer").classList.add("alert");
+    document.body.style.background = "#250000";
+
+    document.getElementById("message").innerText =
+      "⚠ SEM LIGAÇÕES HÁ 20 MINUTOS ⚠";
+
+    document.getElementById("alertSound").play();
+
+  }
+
+}
+
+setInterval(atualizarTimer,1000);
+
+function addLigacao(nome){
+
+  ligacoes[nome]++;
+
+  document.getElementById(nome).innerText = ligacoes[nome];
+
+  totalLigacoes++;
+
+  document.getElementById("totalLigacoes").innerText = totalLigacoes;
+
+  resetTimer();
+
+}
+
+function resetTimer(){
+
+  segundos = 0;
+
+  document.getElementById("timer").classList.remove("alert");
+
+  document.body.style.background = "#050505";
+
+  document.getElementById("message").innerText =
+    "Doeu ligar para o cliente?";
+
+}
+
+</script>
+
+</body>
+</html>
