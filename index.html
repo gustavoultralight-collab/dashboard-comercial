@@ -238,6 +238,10 @@
           Nayara
         </button>
 
+        <button onclick="addLigacao('Enrico')">
+          Enrico
+        </button>
+
         <button class="warning" onclick="adicionarTempo()">
           +
         </button>
@@ -310,6 +314,11 @@ let vendedores = JSON.parse(localStorage.getItem("vendedores")) || {
   },
 
   "Nayara": {
+    diario:0,
+    mensal:0
+  },
+
+  "Enrico": {
     diario:0,
     mensal:0
   }
