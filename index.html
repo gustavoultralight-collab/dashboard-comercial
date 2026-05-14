@@ -291,39 +291,32 @@ let frases = [
 
 ];
 
-let vendedores = JSON.parse(localStorage.getItem("vendedores")) || {
+let vendedores =
+  JSON.parse(localStorage.getItem("vendedores")) || {};
 
-  "Solange": {
-    diario:0,
-    mensal:0
-  },
+if(!vendedores["Solange"]){
+  vendedores["Solange"] = { diario:0, mensal:0 };
+}
 
-  "Lucas": {
-    diario:0,
-    mensal:0
-  },
+if(!vendedores["Lucas"]){
+  vendedores["Lucas"] = { diario:0, mensal:0 };
+}
 
-  "Patrick": {
-    diario:0,
-    mensal:0
-  },
+if(!vendedores["Patrick"]){
+  vendedores["Patrick"] = { diario:0, mensal:0 };
+}
 
-  "Bruna": {
-    diario:0,
-    mensal:0
-  },
+if(!vendedores["Bruna"]){
+  vendedores["Bruna"] = { diario:0, mensal:0 };
+}
 
-  "Nayara": {
-    diario:0,
-    mensal:0
-  },
+if(!vendedores["Nayara"]){
+  vendedores["Nayara"] = { diario:0, mensal:0 };
+}
 
-  "Enrico": {
-    diario:0,
-    mensal:0
-  }
-
-};
+if(!vendedores["Enrico"]){
+  vendedores["Enrico"] = { diario:0, mensal:0 };
+}
 
 let totalLigacoes =
   parseInt(localStorage.getItem("totalLigacoes")) || 0;
