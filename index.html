@@ -1,193 +1,545 @@
-<style>
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial, Helvetica, sans-serif;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Comercial Ultralight</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      background:#050505;
+      color:white;
+      overflow:hidden;
+      transition:0.4s;
+    }
+
+    .container{
+      display:flex;
+      height:100vh;
+      padding:25px;
+      gap:25px;
+    }
+
+    .left,
+    .right{
+      width:24%;
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+
+    .center{
+      flex:1;
+      background:#0d0d0d;
+      border:2px solid #222;
+      border-radius:25px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .card{
+      background:#0d0d0d;
+      border:2px solid #222;
+      border-radius:20px;
+      padding:25px;
+    }
+
+    .card h2{
+      margin-bottom:20px;
+      font-size:28px;
+    }
+
+    .ranking-item{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px;
+      border-radius:12px;
+      margin-bottom:10px;
+      background:rgba(255,255,255,0.04);
+      font-size:22px;
+    }
+
+    .title{
+      font-size:28px;
+      color:#777;
+      margin-bottom:20px;
+    }
+
+    .timer{
+      font-size:140px;
+      font-weight:bold;
+      color:#00ff95;
+      transition:0.3s;
+    }
+
+    .alert{
+      color:red !important;
+      animation:piscar 1s infinite;
+    }
+
+    @keyframes piscar{
+      0%{opacity:1;}
+      50%{opacity:0.3;}
+      100%{opacity:1;}
+    }
+
+    .message{
+      position:absolute;
+      bottom:40px;
+      font-size:32px;
+      color:#999;
+      text-align:center;
+      width:100%;
+      padding:0 20px;
+    }
+
+    .meta{
+      font-size:60px;
+      color:#00ff95;
+      font-weight:bold;
+    }
+
+    hr{
+      border-color:#222;
+      margin:20px 0;
+    }
+
+    .button-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    button{
+      padding:16px;
+      border:none;
+      border-radius:12px;
+      background:#00ff95;
+      color:black;
+      font-weight:bold;
+      cursor:pointer;
+      transition:0.2s;
+      font-size:18px;
+    }
+
+    button:hover{
+      transform:scale(1.03);
+    }
+
+    .danger{
+      background:red;
+      color:white;
+    }
+
+    .warning{
+      background:#ffae00;
+      color:black;
+    }
+
+    .mini{
+      font-size:16px;
+      padding:14px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- ESQUERDA -->
+  <div class="left">
+
+    <div class="card">
+
+      <h2>🏆 Ranking Diário</h2>
+
+      <div id="rankingDiario"></div>
+
+      <hr>
+
+      <h2>📅 Ranking Mensal</h2>
+
+      <div id="rankingMensal"></div>
+
+    </div>
+
+  </div>
+
+  <!-- CENTRO -->
+  <div class="center">
+
+    <div class="title">
+      TEMPO SEM LIGAÇÃO
+    </div>
+
+    <div class="timer" id="timer">
+      00:00
+    </div>
+
+    <div class="message" id="message">
+      Os clientes não vão ligar sozinhos.
+    </div>
+
+  </div>
+
+  <!-- DIREITA -->
+  <div class="right">
+
+    <div class="card">
+      <h2>📞 Ligações Hoje</h2>
+      <div class="meta" id="totalLigacoes">0</div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Meta</h2>
+      <div class="meta">50</div>
+    </div>
+
+    <div class="card">
+
+      <h2>🎮 Controle</h2>
+
+      <div class="button-grid">
+
+        <button onclick="addLigacao('Solange')">
+          Sol
+        </button>
+
+        <button onclick="addLigacao('Lucas')">
+          Lucas
+        </button>
+
+        <button onclick="addLigacao('Patrick')">
+          Patrick
+        </button>
+
+        <button onclick="addLigacao('Bruna')">
+          Bruna
+        </button>
+
+        <button onclick="addLigacao('Nayara')">
+          Nayara
+        </button>
+
+        <button onclick="addLigacao('Enrico')">
+          Enrico
+        </button>
+
+        <button class="warning" onclick="adicionarTempo()">
+          +
+        </button>
+
+        <button class="warning" onclick="tirarTempo()">
+          -
+        </button>
+
+        <button class="danger mini" onclick="resetTimer()">
+          Timer
+        </button>
+
+        <button class="danger mini" onclick="resetRanking()">
+          Diário
+        </button>
+
+        <button class="danger mini" onclick="resetMensal()">
+          Mensal
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<audio id="alertSound">
+  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+</audio>
+
+<script>
+
+let frases = [
+
+  "Doeu ligar para o cliente?",
+  "O telefone não morde.",
+  "Os clientes não vão ligar sozinhos.",
+  "Silêncio demais pra equipe comercial.",
+  "A meta não bate sozinha.",
+  "Call center ou biblioteca?",
+  "Mais uma ligação = mais chance de venda.",
+  "O teclado não fecha venda.",
+  "Sem ligação sem comissão 👀",
+  "Vendedor raiz gosta de ligação."
+
+];
+
+let vendedores =
+  JSON.parse(localStorage.getItem("vendedores")) || {};
+
+if(!vendedores["Solange"]){
+  vendedores["Solange"] = { diario:0, mensal:0 };
 }
 
-body{
-  background:#050505;
-  color:white;
-  overflow:hidden;
+if(!vendedores["Lucas"]){
+  vendedores["Lucas"] = { diario:0, mensal:0 };
 }
 
-/* CONTAINER PRINCIPAL */
-.container{
-  display:flex;
-  height:100vh;
-  padding:12px;
-  gap:12px;
+if(!vendedores["Patrick"]){
+  vendedores["Patrick"] = { diario:0, mensal:0 };
 }
 
-/* LATERAIS */
-.left,
-.right{
-  width:30%;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+if(!vendedores["Bruna"]){
+  vendedores["Bruna"] = { diario:0, mensal:0 };
 }
 
-/* CENTRO */
-.center{
-  flex:1;
-  background:#0d0d0d;
-  border:2px solid #222;
-  border-radius:18px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-  overflow:hidden;
-  padding:10px;
+if(!vendedores["Nayara"]){
+  vendedores["Nayara"] = { diario:0, mensal:0 };
 }
 
-/* CARDS */
-.card{
-  background:#0d0d0d;
-  border:2px solid #222;
-  border-radius:14px;
-  padding:12px;
-  overflow:hidden;
+if(!vendedores["Enrico"]){
+  vendedores["Enrico"] = { diario:0, mensal:0 };
 }
 
-.card h2{
-  font-size:18px;
-  margin-bottom:10px;
+let totalLigacoes =
+  parseInt(localStorage.getItem("totalLigacoes")) || 0;
+
+let segundos =
+  parseInt(localStorage.getItem("segundos")) || 0;
+
+document.getElementById("totalLigacoes")
+  .innerText = totalLigacoes;
+
+function salvarDados(){
+
+  localStorage.setItem(
+    "vendedores",
+    JSON.stringify(vendedores)
+  );
+
+  localStorage.setItem(
+    "totalLigacoes",
+    totalLigacoes
+  );
+
+  localStorage.setItem(
+    "segundos",
+    segundos
+  );
+
 }
 
-/* RANKING SCROLL */
-#rankingDiario,
-#rankingMensal{
-  max-height:35vh;
-  overflow-y:auto;
-}
+function atualizarTimerVisual(){
 
-/* ITEM RANKING */
-.ranking-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:8px;
-  border-radius:10px;
-  margin-bottom:6px;
-  background:rgba(255,255,255,0.04);
-  font-size:14px;
-}
+  let min = Math.floor(segundos / 60);
+  let sec = segundos % 60;
 
-/* TIMER */
-.title{
-  font-size:18px;
-  color:#777;
-  margin-bottom:10px;
-}
+  if(min < 10) min = "0" + min;
+  if(sec < 10) sec = "0" + sec;
 
-.timer{
-  font-size:64px;
-  font-weight:bold;
-  color:#00ff95;
-}
+  document.getElementById("timer").innerText =
+    `${min}:${sec}`;
 
-.alert{
-  color:red !important;
-  animation:piscar 1s infinite;
-}
+  if(segundos >= 1200){
 
-@keyframes piscar{
-  0%{opacity:1;}
-  50%{opacity:0.3;}
-  100%{opacity:1;}
-}
+    document.getElementById("timer")
+      .classList.add("alert");
 
-/* MENSAGEM */
-.message{
-  position:absolute;
-  bottom:20px;
-  font-size:14px;
-  color:#999;
-  text-align:center;
-  width:100%;
-  padding:0 10px;
-}
+    document.body.style.background = "#250000";
 
-/* META */
-.meta{
-  font-size:28px;
-  color:#00ff95;
-  font-weight:bold;
-}
+    document.getElementById("message").innerText =
+      "⚠ SEM LIGAÇÕES HÁ 20 MINUTOS ⚠";
 
-/* BOTÕES */
-.button-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-button{
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:#00ff95;
-  color:black;
-  font-weight:bold;
-  font-size:14px;
-  cursor:pointer;
-}
-
-button:active{
-  transform:scale(0.95);
-}
-
-.danger{
-  background:red;
-  color:white;
-}
-
-.warning{
-  background:#ffae00;
-  color:black;
-}
-
-.mini{
-  font-size:12px;
-  padding:10px;
-}
-
-/* 🔥 MODO CELULAR VERTICAL (IMPORTANTE) */
-@media (max-width: 900px){
-
-  body{
-    overflow:auto;
   }
 
-  .container{
-    flex-direction:column;
-    height:auto;
-  }
+  else{
 
-  .left,
-  .right{
-    width:100%;
-    flex-direction:row;
-    overflow-x:auto;
-  }
+    document.body.style.background = "#050505";
 
-  .card{
-    min-width:260px;
-  }
+    document.getElementById("timer")
+      .classList.remove("alert");
 
-  .center{
-    min-height:40vh;
-  }
-
-  .timer{
-    font-size:70px;
   }
 
 }
 
-</style>
+function atualizarTimer(){
+
+  segundos++;
+
+  atualizarTimerVisual();
+
+  salvarDados();
+
+}
+
+setInterval(atualizarTimer,1000);
+
+function atualizarRanking(){
+
+  let diario = Object.entries(vendedores)
+    .sort((a,b) => b[1].diario - a[1].diario);
+
+  let mensal = Object.entries(vendedores)
+    .sort((a,b) => b[1].mensal - a[1].mensal);
+
+  let htmlDiario = "";
+  let htmlMensal = "";
+
+  diario.forEach((vendedor,index)=>{
+
+    htmlDiario += `
+
+      <div class="ranking-item">
+        <span>${index + 1}. ${vendedor[0]}</span>
+        <span>${vendedor[1].diario}</span>
+      </div>
+
+    `;
+
+  });
+
+  mensal.forEach((vendedor,index)=>{
+
+    htmlMensal += `
+
+      <div class="ranking-item">
+        <span>${index + 1}. ${vendedor[0]}</span>
+        <span>${vendedor[1].mensal}</span>
+      </div>
+
+    `;
+
+  });
+
+  document.getElementById("rankingDiario")
+    .innerHTML = htmlDiario;
+
+  document.getElementById("rankingMensal")
+    .innerHTML = htmlMensal;
+
+}
+
+atualizarRanking();
+atualizarTimerVisual();
+
+function fraseAleatoria(){
+
+  let frase =
+    frases[Math.floor(Math.random() * frases.length)];
+
+  document.getElementById("message").innerText =
+    frase;
+
+}
+
+function addLigacao(nome){
+
+  vendedores[nome].diario++;
+  vendedores[nome].mensal++;
+
+  totalLigacoes++;
+
+  document.getElementById("totalLigacoes")
+    .innerText = totalLigacoes;
+
+  atualizarRanking();
+
+  fraseAleatoria();
+
+  resetTimer();
+
+  salvarDados();
+
+}
+
+function adicionarTempo(){
+
+  segundos += 60;
+
+  atualizarTimerVisual();
+
+  salvarDados();
+
+}
+
+function tirarTempo(){
+
+  segundos -= 60;
+
+  if(segundos < 0){
+
+    segundos = 0;
+
+  }
+
+  atualizarTimerVisual();
+
+  salvarDados();
+
+}
+
+function resetTimer(){
+
+  segundos = 0;
+
+  atualizarTimerVisual();
+
+  salvarDados();
+
+}
+
+function resetRanking(){
+
+  for(let nome in vendedores){
+
+    vendedores[nome].diario = 0;
+
+  }
+
+  totalLigacoes = 0;
+
+  document.getElementById("totalLigacoes")
+    .innerText = 0;
+
+  atualizarRanking();
+
+  salvarDados();
+
+}
+
+function resetMensal(){
+
+  for(let nome in vendedores){
+
+    vendedores[nome].mensal = 0;
+
+  }
+
+  atualizarRanking();
+
+  salvarDados();
+
+}
+
+</script>
+
+</body>
+</html>
