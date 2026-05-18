@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 
 <meta charset="UTF-8">
@@ -159,6 +160,8 @@ input{
 
 <div class="container">
 
+  <!-- ESQUERDA -->
+
   <div class="left">
 
     <div class="card">
@@ -171,7 +174,7 @@ input{
 
     <div class="card">
 
-      <h2>💰</h2>
+      <h2>💰 Metas</h2>
 
       <input
         id="tituloPercentual"
@@ -187,7 +190,49 @@ input{
 
         <input
           type="number"
-          id="percentual"
+          id="percentualControle"
+          class="percent-input"
+          value="0"
+          min="0"
+        >
+
+      </div>
+
+      <div class="ranking-item">
+
+        <span>Patrick</span>
+
+        <input
+          type="number"
+          id="percentualPatrick"
+          class="percent-input"
+          value="0"
+          min="0"
+        >
+
+      </div>
+
+      <div class="ranking-item">
+
+        <span>Bruna</span>
+
+        <input
+          type="number"
+          id="percentualBruna"
+          class="percent-input"
+          value="0"
+          min="0"
+        >
+
+      </div>
+
+      <div class="ranking-item">
+
+        <span>Nayara</span>
+
+        <input
+          type="number"
+          id="percentualNayara"
           class="percent-input"
           value="0"
           min="0"
@@ -198,6 +243,8 @@ input{
     </div>
 
   </div>
+
+  <!-- CENTRO -->
 
   <div class="center">
 
@@ -210,6 +257,8 @@ input{
     </div>
 
   </div>
+
+  <!-- DIREITA -->
 
   <div class="right">
 
@@ -305,12 +354,21 @@ let segundos =
 
 document.getElementById("total").innerText = total;
 
-document.getElementById("percentual").value =
-  localStorage.getItem("percentual") || 0;
-
 document.getElementById("tituloPercentual").value =
   localStorage.getItem("tituloPercentual")
   || "% de Vendas";
+
+document.getElementById("percentualControle").value =
+  localStorage.getItem("percentualControle") || 0;
+
+document.getElementById("percentualPatrick").value =
+  localStorage.getItem("percentualPatrick") || 0;
+
+document.getElementById("percentualBruna").value =
+  localStorage.getItem("percentualBruna") || 0;
+
+document.getElementById("percentualNayara").value =
+  localStorage.getItem("percentualNayara") || 0;
 
 function salvar(){
 
@@ -324,13 +382,28 @@ function salvar(){
   localStorage.setItem("segundos",segundos);
 
   localStorage.setItem(
-    "percentual",
-    document.getElementById("percentual").value
+    "tituloPercentual",
+    document.getElementById("tituloPercentual").value
   );
 
   localStorage.setItem(
-    "tituloPercentual",
-    document.getElementById("tituloPercentual").value
+    "percentualControle",
+    document.getElementById("percentualControle").value
+  );
+
+  localStorage.setItem(
+    "percentualPatrick",
+    document.getElementById("percentualPatrick").value
+  );
+
+  localStorage.setItem(
+    "percentualBruna",
+    document.getElementById("percentualBruna").value
+  );
+
+  localStorage.setItem(
+    "percentualNayara",
+    document.getElementById("percentualNayara").value
   );
 
 }
@@ -465,10 +538,19 @@ function resetarRanking(){
 
 setInterval(atualizarTimer,1000);
 
-document.getElementById("percentual")
+document.getElementById("tituloPercentual")
 .addEventListener("input",salvar);
 
-document.getElementById("tituloPercentual")
+document.getElementById("percentualControle")
+.addEventListener("input",salvar);
+
+document.getElementById("percentualPatrick")
+.addEventListener("input",salvar);
+
+document.getElementById("percentualBruna")
+.addEventListener("input",salvar);
+
+document.getElementById("percentualNayara")
 .addEventListener("input",salvar);
 
 atualizarRanking();
