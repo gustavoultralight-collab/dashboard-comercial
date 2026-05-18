@@ -74,24 +74,6 @@
       font-size:22px;
     }
 
-    .venda-controls{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    .mini-btn{
-      width:32px;
-      height:32px;
-      border:none;
-      border-radius:8px;
-      background:#00ff95;
-      color:black;
-      font-weight:bold;
-      cursor:pointer;
-      font-size:18px;
-    }
-
     .title{
       font-size:28px;
       color:#777;
@@ -176,7 +158,7 @@
     }
 
     .edit-input{
-      width:120px;
+      width:90px;
       height:42px;
       border:none;
       border-radius:10px;
@@ -189,7 +171,7 @@
     }
 
     .title-input{
-      width:220px;
+      width:260px;
       background:transparent;
       border:none;
       color:white;
@@ -224,7 +206,7 @@
           type="text"
           id="tituloPercentual"
           class="title-input"
-          value="% de Vendas Ideal"
+          value="% de Vendas"
           oninput="salvarTitulo()"
         >
 
@@ -236,20 +218,14 @@
           Controle de Pragas
         </span>
 
-        <div class="venda-controls">
-
-          <input
-            type="number"
-            id="percentualInput"
-            class="edit-input"
-            value="1"
-            min="0"
-            oninput="alterarPercentualManual()"
-          />
-
-          <span>%</span>
-
-        </div>
+        <input
+          type="number"
+          id="controlePragasInput"
+          class="edit-input"
+          min="0"
+          value="0"
+          oninput="salvarPercentual()"
+        />
 
       </div>
 
@@ -389,38 +365,22 @@ if(!vendedores["Enrico"]){
   vendedores["Enrico"] = { diario:0 };
 }
 
-let percentualControle =
-  localStorage.getItem("percentualControle");
-
-if(percentualControle === null){
-
-  percentualControle = 1;
-
-}else{
-
-  percentualControle = parseInt(percentualControle);
-
-}
-
-let tituloPercentual =
-  localStorage.getItem("tituloPercentual");
-
-if(tituloPercentual === null){
-
-  tituloPercentual = "% de Vendas Ideal";
-
-}
-
 let totalLigacoes =
   parseInt(localStorage.getItem("totalLigacoes")) || 0;
 
 let segundos =
   parseInt(localStorage.getItem("segundos")) || 0;
 
+let percentualControle =
+  parseInt(localStorage.getItem("percentualControle")) || 0;
+
+let tituloPercentual =
+  localStorage.getItem("tituloPercentual") || "% de Vendas";
+
 document.getElementById("totalLigacoes")
   .innerText = totalLigacoes;
 
-document.getElementById("percentualInput")
+document.getElementById("controlePragasInput")
   .value = percentualControle;
 
 document.getElementById("tituloPercentual")
@@ -443,9 +403,16 @@ function salvarDados(){
     segundos
   );
 
+}
+
+function salvarPercentual(){
+
+  let valor =
+    document.getElementById("controlePragasInput").value;
+
   localStorage.setItem(
     "percentualControle",
-    percentualControle
+    valor
   );
 
 }
@@ -459,17 +426,6 @@ function salvarTitulo(){
     "tituloPercentual",
     valor
   );
-
-}
-
-function alterarPercentualManual(){
-
-  percentualControle =
-    parseInt(
-      document.getElementById("percentualInput").value
-    ) || 0;
-
-  salvarDados();
 
 }
 
