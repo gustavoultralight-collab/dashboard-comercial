@@ -195,7 +195,28 @@
 
       <h2>💰 % de Vendas</h2>
 
-      <div id="percentuais"></div>
+      <div class="ranking-item">
+
+        <span>
+          Controle de Pragas / Revenda
+          <span id="percentualTexto">1%</span>
+        </span>
+
+        <div class="venda-controls">
+
+          <button class="mini-btn"
+            onclick="alterarPercentual(-1)">
+            -
+          </button>
+
+          <button class="mini-btn"
+            onclick="alterarPercentual(1)">
+            +
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
 
@@ -333,25 +354,8 @@ if(!vendedores["Enrico"]){
   vendedores["Enrico"] = { diario:0 };
 }
 
-if(!vendedores["Controle de Pragas"]){
-  vendedores["Controle de Pragas"] = {
-    vendas:1
-  };
-}
-
-if(!vendedores["Revenda"]){
-  vendedores["Revenda"] = {
-    vendas:1
-  };
-}
-
-if(vendedores["Controle de Pragas"].vendas === undefined){
-  vendedores["Controle de Pragas"].vendas = 1;
-}
-
-if(vendedores["Revenda"].vendas === undefined){
-  vendedores["Revenda"].vendas = 1;
-}
+let percentualVendas =
+  parseInt(localStorage.getItem("percentualVendas")) || 1;
 
 let totalLigacoes =
   parseInt(localStorage.getItem("totalLigacoes")) || 0;
@@ -361,6 +365,9 @@ let segundos =
 
 document.getElementById("totalLigacoes")
   .innerText = totalLigacoes;
+
+document.getElementById("percentualTexto")
+  .innerText = percentualVendas + "%";
 
 function salvarDados(){
 
@@ -378,6 +385,26 @@ function salvarDados(){
     "segundos",
     segundos
   );
+
+  localStorage.setItem(
+    "percentualVendas",
+    percentualVendas
+  );
+
+}
+
+function alterarPercentual(valor){
+
+  percentualVendas += valor;
+
+  if(percentualVendas < 0){
+    percentualVendas = 0;
+  }
+
+  document.getElementById("percentualTexto")
+    .innerText = percentualVendas + "%";
+
+  salvarDados();
 
 }
 
@@ -433,11 +460,6 @@ function atualizarRanking(){
 
   let diario = Object.entries(vendedores)
 
-    .filter(v =>
-      v[0] !== "Controle de Pragas" &&
-      v[0] !== "Revenda"
-    )
-
     .sort((a,b) => b[1].diario - a[1].diario);
 
   let htmlDiario = "";
@@ -460,68 +482,7 @@ function atualizarRanking(){
 
 }
 
-function atualizarPercentuais(){
-
-  let categorias = [
-
-    "Controle de Pragas",
-    "Revenda"
-
-  ];
-
-  let html = "";
-
-  categorias.forEach((nome)=>{
-
-    html += `
-
-      <div class="ranking-item">
-
-        <span>
-          ${nome} ${vendedores[nome].vendas}%
-        </span>
-
-        <div class="venda-controls">
-
-          <button class="mini-btn"
-            onclick="alterarVenda('${nome}', -1)">
-            -
-          </button>
-
-          <button class="mini-btn"
-            onclick="alterarVenda('${nome}', 1)">
-            +
-          </button>
-
-        </div>
-
-      </div>
-
-    `;
-
-  });
-
-  document.getElementById("percentuais")
-    .innerHTML = html;
-
-}
-
-function alterarVenda(nome, valor){
-
-  vendedores[nome].vendas += valor;
-
-  if(vendedores[nome].vendas < 0){
-    vendedores[nome].vendas = 0;
-  }
-
-  atualizarPercentuais();
-
-  salvarDados();
-
-}
-
 atualizarRanking();
-atualizarPercentuais();
 atualizarTimerVisual();
 
 function fraseAleatoria(){
@@ -568,9 +529,7 @@ function tirarTempo(){
   segundos -= 60;
 
   if(segundos < 0){
-
     segundos = 0;
-
   }
 
   atualizarTimerVisual();
@@ -593,12 +552,7 @@ function resetRanking(){
 
   for(let nome in vendedores){
 
-    if(nome !== "Controle de Pragas" &&
-       nome !== "Revenda"){
-
-      vendedores[nome].diario = 0;
-
-    }
+    vendedores[nome].diario = 0;
 
   }
 
