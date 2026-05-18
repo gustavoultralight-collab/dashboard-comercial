@@ -310,23 +310,47 @@ let vendedores =
   JSON.parse(localStorage.getItem("vendedores")) || {};
 
 if(!vendedores["Solange"]){
-  vendedores["Solange"] = { diario:0, vendas:1 };
+  vendedores["Solange"] = { diario:0 };
 }
 
 if(!vendedores["Lucas"]){
-  vendedores["Lucas"] = { diario:0, vendas:1 };
+  vendedores["Lucas"] = { diario:0 };
 }
 
 if(!vendedores["Patrick"]){
-  vendedores["Patrick"] = { diario:0, vendas:1 };
+  vendedores["Patrick"] = { diario:0 };
 }
 
 if(!vendedores["Bruna"]){
-  vendedores["Bruna"] = { diario:0, vendas:1 };
+  vendedores["Bruna"] = { diario:0 };
 }
 
 if(!vendedores["Nayara"]){
-  vendedores["Nayara"] = { diario:0, vendas:1 };
+  vendedores["Nayara"] = { diario:0 };
+}
+
+if(!vendedores["Enrico"]){
+  vendedores["Enrico"] = { diario:0 };
+}
+
+if(!vendedores["Controle de Pragas"]){
+  vendedores["Controle de Pragas"] = {
+    vendas:1
+  };
+}
+
+if(!vendedores["Revenda"]){
+  vendedores["Revenda"] = {
+    vendas:1
+  };
+}
+
+if(vendedores["Controle de Pragas"].vendas === undefined){
+  vendedores["Controle de Pragas"].vendas = 1;
+}
+
+if(vendedores["Revenda"].vendas === undefined){
+  vendedores["Revenda"].vendas = 1;
 }
 
 let totalLigacoes =
@@ -408,6 +432,12 @@ setInterval(atualizarTimer,1000);
 function atualizarRanking(){
 
   let diario = Object.entries(vendedores)
+
+    .filter(v =>
+      v[0] !== "Controle de Pragas" &&
+      v[0] !== "Revenda"
+    )
+
     .sort((a,b) => b[1].diario - a[1].diario);
 
   let htmlDiario = "";
@@ -432,27 +462,34 @@ function atualizarRanking(){
 
 function atualizarPercentuais(){
 
+  let categorias = [
+
+    "Controle de Pragas",
+    "Revenda"
+
+  ];
+
   let html = "";
 
-  Object.entries(vendedores).forEach((vendedor)=>{
+  categorias.forEach((nome)=>{
 
     html += `
 
       <div class="ranking-item">
 
         <span>
-          ${vendedor[0]} ${vendedor[1].vendas}%
+          ${nome} ${vendedores[nome].vendas}%
         </span>
 
         <div class="venda-controls">
 
           <button class="mini-btn"
-            onclick="alterarVenda('${vendedor[0]}', -1)">
+            onclick="alterarVenda('${nome}', -1)">
             -
           </button>
 
           <button class="mini-btn"
-            onclick="alterarVenda('${vendedor[0]}', 1)">
+            onclick="alterarVenda('${nome}', 1)">
             +
           </button>
 
@@ -556,7 +593,12 @@ function resetRanking(){
 
   for(let nome in vendedores){
 
-    vendedores[nome].diario = 0;
+    if(nome !== "Controle de Pragas" &&
+       nome !== "Revenda"){
+
+      vendedores[nome].diario = 0;
+
+    }
 
   }
 
