@@ -74,6 +74,24 @@
       font-size:22px;
     }
 
+    .venda-controls{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .mini-btn{
+      width:28px;
+      height:28px;
+      border:none;
+      border-radius:8px;
+      background:#00ff95;
+      color:black;
+      font-weight:bold;
+      cursor:pointer;
+      font-size:16px;
+    }
+
     .title{
       font-size:28px;
       color:#777;
@@ -101,11 +119,12 @@
     .message{
       position:absolute;
       bottom:40px;
-      font-size:32px;
+      font-size:46px;
       color:#999;
       text-align:center;
       width:100%;
-      padding:0 20px;
+      padding:0 30px;
+      font-weight:bold;
     }
 
     .meta{
@@ -156,55 +175,6 @@
       padding:14px;
     }
 
-    /* ===== AJUSTE CELULAR HORIZONTAL (CORREÇÃO FINAL) ===== */
-    @media (max-width: 1000px) and (orientation: landscape){
-
-  body{
-    overflow:auto !important;
-  }
-
-  .container{
-    padding:8px !important;
-    gap:8px !important;
-    height:100vh;
-  }
-
-  .left,
-  .right{
-    width:22% !important;
-  }
-
-  .card{
-    padding:10px !important;
-  }
-
-  .card h2{
-    font-size:16px !important;
-  }
-
-  .timer{
-    font-size:85px !important;
-  }
-
-  .meta{
-    font-size:38px !important;
-  }
-
-  .ranking-item{
-    font-size:12px !important;
-    padding:8px;
-  }
-
-  button{
-    font-size:12px !important;
-    padding:10px !important;
-  }
-
-  .message{
-    font-size:16px !important;
-  }
-
-}
   </style>
 </head>
 
@@ -212,23 +182,35 @@
 
 <div class="container">
 
+  <!-- ESQUERDA -->
   <div class="left">
 
     <div class="card">
+
       <h2>🏆 Ranking Diário</h2>
+
       <div id="rankingDiario"></div>
+
       <hr>
-      <h2>📅 Ranking Mensal</h2>
-      <div id="rankingMensal"></div>
+
+      <h2>💰 % de Vendas</h2>
+
+      <div id="percentuais"></div>
+
     </div>
 
   </div>
 
+  <!-- CENTRO -->
   <div class="center">
 
-    <div class="title">TEMPO SEM LIGAÇÃO</div>
+    <div class="title">
+      TEMPO SEM LIGAÇÃO
+    </div>
 
-    <div class="timer" id="timer">00:00</div>
+    <div class="timer" id="timer">
+      00:00
+    </div>
 
     <div class="message" id="message">
       Os clientes não vão ligar sozinhos.
@@ -236,6 +218,7 @@
 
   </div>
 
+  <!-- DIREITA -->
   <div class="right">
 
     <div class="card">
@@ -254,19 +237,45 @@
 
       <div class="button-grid">
 
-        <button onclick="addLigacao('Solange')">Sol</button>
-        <button onclick="addLigacao('Lucas')">Lucas</button>
-        <button onclick="addLigacao('Patrick')">Patrick</button>
-        <button onclick="addLigacao('Bruna')">Bruna</button>
-        <button onclick="addLigacao('Nayara')">Nayara</button>
-        <button onclick="addLigacao('Enrico')">Enrico</button>
+        <button onclick="addLigacao('Solange')">
+          Sol
+        </button>
 
-        <button class="warning" onclick="adicionarTempo()">+</button>
-        <button class="warning" onclick="tirarTempo()">-</button>
+        <button onclick="addLigacao('Lucas')">
+          Lucas
+        </button>
 
-        <button class="danger mini" onclick="resetTimer()">Timer</button>
-        <button class="danger mini" onclick="resetRanking()">Diário</button>
-        <button class="danger mini" onclick="resetMensal()">Mensal</button>
+        <button onclick="addLigacao('Patrick')">
+          Patrick
+        </button>
+
+        <button onclick="addLigacao('Bruna')">
+          Bruna
+        </button>
+
+        <button onclick="addLigacao('Nayara')">
+          Nayara
+        </button>
+
+        <button onclick="addLigacao('Enrico')">
+          Enrico
+        </button>
+
+        <button class="warning" onclick="adicionarTempo()">
+          +
+        </button>
+
+        <button class="warning" onclick="tirarTempo()">
+          -
+        </button>
+
+        <button class="danger mini" onclick="resetTimer()">
+          Timer
+        </button>
+
+        <button class="danger mini" onclick="resetRanking()">
+          Diário
+        </button>
 
       </div>
 
@@ -283,6 +292,7 @@
 <script>
 
 let frases = [
+
   "Doeu ligar para o cliente?",
   "O telefone não morde.",
   "Os clientes não vão ligar sozinhos.",
@@ -293,25 +303,62 @@ let frases = [
   "O teclado não fecha venda.",
   "Sem ligação sem comissão 👀",
   "Vendedor raiz gosta de ligação."
+
 ];
 
-let vendedores = JSON.parse(localStorage.getItem("vendedores")) || {};
+let vendedores =
+  JSON.parse(localStorage.getItem("vendedores")) || {};
 
-["Solange","Lucas","Patrick","Bruna","Nayara","Enrico"].forEach(nome=>{
-  if(!vendedores[nome]){
-    vendedores[nome] = { diario:0, mensal:0 };
-  }
-});
+if(!vendedores["Solange"]){
+  vendedores["Solange"] = { diario:0, vendas:0 };
+}
 
-let totalLigacoes = parseInt(localStorage.getItem("totalLigacoes")) || 0;
-let segundos = parseInt(localStorage.getItem("segundos")) || 0;
+if(!vendedores["Lucas"]){
+  vendedores["Lucas"] = { diario:0, vendas:0 };
+}
 
-document.getElementById("totalLigacoes").innerText = totalLigacoes;
+if(!vendedores["Patrick"]){
+  vendedores["Patrick"] = { diario:0, vendas:0 };
+}
+
+if(!vendedores["Bruna"]){
+  vendedores["Bruna"] = { diario:0, vendas:0 };
+}
+
+if(!vendedores["Nayara"]){
+  vendedores["Nayara"] = { diario:0, vendas:0 };
+}
+
+if(!vendedores["Enrico"]){
+  vendedores["Enrico"] = { diario:0, vendas:0 };
+}
+
+let totalLigacoes =
+  parseInt(localStorage.getItem("totalLigacoes")) || 0;
+
+let segundos =
+  parseInt(localStorage.getItem("segundos")) || 0;
+
+document.getElementById("totalLigacoes")
+  .innerText = totalLigacoes;
 
 function salvarDados(){
-  localStorage.setItem("vendedores", JSON.stringify(vendedores));
-  localStorage.setItem("totalLigacoes", totalLigacoes);
-  localStorage.setItem("segundos", segundos);
+
+  localStorage.setItem(
+    "vendedores",
+    JSON.stringify(vendedores)
+  );
+
+  localStorage.setItem(
+    "totalLigacoes",
+    totalLigacoes
+  );
+
+  localStorage.setItem(
+    "segundos",
+    segundos
+  );
+
 }
 
 function atualizarTimerVisual(){
@@ -322,78 +369,210 @@ function atualizarTimerVisual(){
   if(min < 10) min = "0" + min;
   if(sec < 10) sec = "0" + sec;
 
-  document.getElementById("timer").innerText = `${min}:${sec}`;
+  document.getElementById("timer").innerText =
+    `${min}:${sec}`;
 
   if(segundos >= 1200){
-    document.getElementById("timer").classList.add("alert");
+
+    document.getElementById("timer")
+      .classList.add("alert");
+
     document.body.style.background = "#250000";
+
     document.getElementById("message").innerText =
       "⚠ SEM LIGAÇÕES HÁ 20 MINUTOS ⚠";
-  } else {
-    document.body.style.background = "#050505";
-    document.getElementById("timer").classList.remove("alert");
+
+    document.getElementById("alertSound").play();
+
   }
+
+  else{
+
+    document.body.style.background = "#050505";
+
+    document.getElementById("timer")
+      .classList.remove("alert");
+
+  }
+
 }
 
 function atualizarTimer(){
+
   segundos++;
+
   atualizarTimerVisual();
+
   salvarDados();
+
 }
 
 setInterval(atualizarTimer,1000);
 
 function atualizarRanking(){
 
-  let diario = Object.entries(vendedores).sort((a,b)=>b[1].diario-a[1].diario);
-  let mensal = Object.entries(vendedores).sort((a,b)=>b[1].mensal-a[1].mensal);
+  let diario = Object.entries(vendedores)
+    .sort((a,b) => b[1].diario - a[1].diario);
 
-  document.getElementById("rankingDiario").innerHTML =
-    diario.map((v,i)=>
-      `<div class="ranking-item"><span>${i+1}. ${v[0]}</span><span>${v[1].diario}</span></div>`
-    ).join("");
+  let htmlDiario = "";
 
-  document.getElementById("rankingMensal").innerHTML =
-    mensal.map((v,i)=>
-      `<div class="ranking-item"><span>${i+1}. ${v[0]}</span><span>${v[1].mensal}</span></div>`
-    ).join("");
+  diario.forEach((vendedor,index)=>{
+
+    htmlDiario += `
+
+      <div class="ranking-item">
+        <span>${index + 1}. ${vendedor[0]}</span>
+        <span>${vendedor[1].diario}</span>
+      </div>
+
+    `;
+
+  });
+
+  document.getElementById("rankingDiario")
+    .innerHTML = htmlDiario;
+
+}
+
+function atualizarPercentuais(){
+
+  let html = "";
+
+  Object.entries(vendedores).forEach((vendedor)=>{
+
+    html += `
+
+      <div class="ranking-item">
+
+        <span>
+          ${vendedor[0]} ${vendedor[1].vendas}%
+        </span>
+
+        <div class="venda-controls">
+
+          <button class="mini-btn"
+            onclick="alterarVenda('${vendedor[0]}', -1)">
+            -
+          </button>
+
+          <button class="mini-btn"
+            onclick="alterarVenda('${vendedor[0]}', 1)">
+            +
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+  document.getElementById("percentuais")
+    .innerHTML = html;
+
+}
+
+function alterarVenda(nome, valor){
+
+  vendedores[nome].vendas += valor;
+
+  if(vendedores[nome].vendas < 0){
+    vendedores[nome].vendas = 0;
+  }
+
+  atualizarPercentuais();
+
+  salvarDados();
+
 }
 
 atualizarRanking();
+atualizarPercentuais();
 atualizarTimerVisual();
 
 function fraseAleatoria(){
+
+  let frase =
+    frases[Math.floor(Math.random() * frases.length)];
+
   document.getElementById("message").innerText =
-    frases[Math.floor(Math.random()*frases.length)];
+    frase;
+
 }
 
 function addLigacao(nome){
+
   vendedores[nome].diario++;
-  vendedores[nome].mensal++;
+
   totalLigacoes++;
-  document.getElementById("totalLigacoes").innerText = totalLigacoes;
+
+  document.getElementById("totalLigacoes")
+    .innerText = totalLigacoes;
+
   atualizarRanking();
+
   fraseAleatoria();
+
   resetTimer();
+
   salvarDados();
+
 }
 
-function adicionarTempo(){ segundos+=60; atualizarTimerVisual(); salvarDados(); }
-function tirarTempo(){ segundos=Math.max(0,segundos-60); atualizarTimerVisual(); salvarDados(); }
-function resetTimer(){ segundos=0; atualizarTimerVisual(); salvarDados(); }
+function adicionarTempo(){
+
+  segundos += 60;
+
+  atualizarTimerVisual();
+
+  salvarDados();
+
+}
+
+function tirarTempo(){
+
+  segundos -= 60;
+
+  if(segundos < 0){
+
+    segundos = 0;
+
+  }
+
+  atualizarTimerVisual();
+
+  salvarDados();
+
+}
+
+function resetTimer(){
+
+  segundos = 0;
+
+  atualizarTimerVisual();
+
+  salvarDados();
+
+}
 
 function resetRanking(){
-  for(let n in vendedores) vendedores[n].diario=0;
-  totalLigacoes=0;
-  document.getElementById("totalLigacoes").innerText=0;
-  atualizarRanking();
-  salvarDados();
-}
 
-function resetMensal(){
-  for(let n in vendedores) vendedores[n].mensal=0;
+  for(let nome in vendedores){
+
+    vendedores[nome].diario = 0;
+
+  }
+
+  totalLigacoes = 0;
+
+  document.getElementById("totalLigacoes")
+    .innerText = 0;
+
   atualizarRanking();
+
   salvarDados();
+
 }
 
 </script>
