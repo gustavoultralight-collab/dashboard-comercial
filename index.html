@@ -193,24 +193,28 @@
 
       <hr>
 
-      <h2>💰 % de Vendas</h2>
+      <h2>
+        💰 % de Vendas Ideal:
+        <span id="percentualIdealTexto">30%</span>
+      </h2>
 
       <div class="ranking-item">
 
         <span>
-          Controle de Pragas / Revenda
-          <span id="percentualTexto">1%</span>
+          Controle de Pragas
         </span>
 
         <div class="venda-controls">
 
           <button class="mini-btn"
-            onclick="alterarPercentual(-1)">
+            onclick="alterarPercentualIdeal(-1)">
             -
           </button>
 
+          <span id="percentualTexto">1%</span>
+
           <button class="mini-btn"
-            onclick="alterarPercentual(1)">
+            onclick="alterarPercentualIdeal(1)">
             +
           </button>
 
@@ -354,16 +358,29 @@ if(!vendedores["Enrico"]){
   vendedores["Enrico"] = { diario:0 };
 }
 
-let percentualVendas =
-  localStorage.getItem("percentualVendas");
+let percentualControle =
+  localStorage.getItem("percentualControle");
 
-if(percentualVendas === null){
+if(percentualControle === null){
 
-  percentualVendas = 1;
+  percentualControle = 1;
 
 }else{
 
-  percentualVendas = parseInt(percentualVendas);
+  percentualControle = parseInt(percentualControle);
+
+}
+
+let percentualIdeal =
+  localStorage.getItem("percentualIdeal");
+
+if(percentualIdeal === null){
+
+  percentualIdeal = 30;
+
+}else{
+
+  percentualIdeal = parseInt(percentualIdeal);
 
 }
 
@@ -375,6 +392,12 @@ let segundos =
 
 document.getElementById("totalLigacoes")
   .innerText = totalLigacoes;
+
+document.getElementById("percentualTexto")
+  .innerText = percentualControle + "%";
+
+document.getElementById("percentualIdealTexto")
+  .innerText = percentualIdeal + "%";
 
 function salvarDados(){
 
@@ -394,22 +417,27 @@ function salvarDados(){
   );
 
   localStorage.setItem(
-    "percentualVendas",
-    percentualVendas
+    "percentualControle",
+    percentualControle
+  );
+
+  localStorage.setItem(
+    "percentualIdeal",
+    percentualIdeal
   );
 
 }
 
-function alterarPercentual(valor){
+function alterarPercentualIdeal(valor){
 
-  percentualVendas += valor;
+  percentualControle += valor;
 
-  if(percentualVendas < 0){
-    percentualVendas = 0;
+  if(percentualControle < 0){
+    percentualControle = 0;
   }
 
   document.getElementById("percentualTexto")
-    .innerText = percentualVendas + "%";
+    .innerText = percentualControle + "%";
 
   salvarDados();
 
@@ -488,9 +516,6 @@ function atualizarRanking(){
     .innerHTML = htmlDiario;
 
 }
-
-document.getElementById("percentualTexto")
-  .innerText = percentualVendas + "%";
 
 atualizarRanking();
 atualizarTimerVisual();
