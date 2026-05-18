@@ -81,15 +81,15 @@
     }
 
     .mini-btn{
-      width:28px;
-      height:28px;
+      width:32px;
+      height:32px;
       border:none;
       border-radius:8px;
       background:#00ff95;
       color:black;
       font-weight:bold;
       cursor:pointer;
-      font-size:16px;
+      font-size:18px;
     }
 
     .title{
@@ -119,11 +119,11 @@
     .message{
       position:absolute;
       bottom:40px;
-      font-size:46px;
+      font-size:52px;
       color:#999;
       text-align:center;
       width:100%;
-      padding:0 30px;
+      padding:0 40px;
       font-weight:bold;
     }
 
@@ -355,7 +355,17 @@ if(!vendedores["Enrico"]){
 }
 
 let percentualVendas =
-  parseInt(localStorage.getItem("percentualVendas")) || 1;
+  localStorage.getItem("percentualVendas");
+
+if(percentualVendas === null){
+
+  percentualVendas = 1;
+
+}else{
+
+  percentualVendas = parseInt(percentualVendas);
+
+}
 
 let totalLigacoes =
   parseInt(localStorage.getItem("totalLigacoes")) || 0;
@@ -365,9 +375,6 @@ let segundos =
 
 document.getElementById("totalLigacoes")
   .innerText = totalLigacoes;
-
-document.getElementById("percentualTexto")
-  .innerText = percentualVendas + "%";
 
 function salvarDados(){
 
@@ -481,6 +488,9 @@ function atualizarRanking(){
     .innerHTML = htmlDiario;
 
 }
+
+document.getElementById("percentualTexto")
+  .innerText = percentualVendas + "%";
 
 atualizarRanking();
 atualizarTimerVisual();
