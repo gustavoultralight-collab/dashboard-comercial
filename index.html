@@ -142,14 +142,24 @@ input{
   outline:none;
 }
 
-.title-input{
-  width:100%;
-  margin-top:10px;
-}
-
 .percent-input{
   width:90px;
   text-align:center;
+}
+
+.meta-title{
+  width:100%;
+  background:#181818;
+  color:red;
+  text-align:center;
+}
+
+#ultimaLigacao{
+  position:absolute;
+  top:40px;
+  font-size:28px;
+  color:#00ff95;
+  font-weight:bold;
 }
 
 </style>
@@ -177,9 +187,9 @@ input{
       <h2>💰 Metas</h2>
 
       <input
-        id="tituloPercentual"
-        class="title-input"
-        value="% de Vendas"
+        id="tituloMeta"
+        class="meta-title"
+        value="META IDEAL DE VENDAS"
       >
 
       <br><br>
@@ -190,7 +200,7 @@ input{
 
         <input
           type="number"
-          id="percentualControle"
+          id="controle"
           class="percent-input"
           value="0"
           min="0"
@@ -204,7 +214,7 @@ input{
 
         <input
           type="number"
-          id="percentualPatrick"
+          id="patrick"
           class="percent-input"
           value="0"
           min="0"
@@ -218,7 +228,7 @@ input{
 
         <input
           type="number"
-          id="percentualBruna"
+          id="bruna"
           class="percent-input"
           value="0"
           min="0"
@@ -232,7 +242,7 @@ input{
 
         <input
           type="number"
-          id="percentualNayara"
+          id="nayara"
           class="percent-input"
           value="0"
           min="0"
@@ -247,6 +257,10 @@ input{
   <!-- CENTRO -->
 
   <div class="center">
+
+    <div id="ultimaLigacao">
+      Última ligação: —
+    </div>
 
     <div class="timer" id="timer">
       00:00
@@ -264,7 +278,7 @@ input{
 
     <div class="card">
 
-      <h2>📞 Ligações Hoje</h2>
+      <h2>📞 Ligações de Hoje</h2>
 
       <div class="meta" id="total">
         0
@@ -329,7 +343,11 @@ const frases = [
   "A meta não bate sozinha.",
   "Silêncio demais pra equipe comercial.",
   "Mais ligação = mais venda.",
-  "O teclado não fecha venda."
+  "O teclado não fecha venda.",
+  "Cliente não responde? Liga.",
+  "WhatsApp não fecha tudo.",
+  "Bora movimentar esse comercial.",
+  "Sem ligação sem negociação."
 
 ];
 
@@ -354,21 +372,21 @@ let segundos =
 
 document.getElementById("total").innerText = total;
 
-document.getElementById("tituloPercentual").value =
-  localStorage.getItem("tituloPercentual")
-  || "% de Vendas";
+document.getElementById("tituloMeta").value =
+  localStorage.getItem("tituloMeta")
+  || "META IDEAL DE VENDAS";
 
-document.getElementById("percentualControle").value =
-  localStorage.getItem("percentualControle") || 0;
+document.getElementById("controle").value =
+  localStorage.getItem("controle") || 0;
 
-document.getElementById("percentualPatrick").value =
-  localStorage.getItem("percentualPatrick") || 0;
+document.getElementById("patrick").value =
+  localStorage.getItem("patrick") || 0;
 
-document.getElementById("percentualBruna").value =
-  localStorage.getItem("percentualBruna") || 0;
+document.getElementById("bruna").value =
+  localStorage.getItem("bruna") || 0;
 
-document.getElementById("percentualNayara").value =
-  localStorage.getItem("percentualNayara") || 0;
+document.getElementById("nayara").value =
+  localStorage.getItem("nayara") || 0;
 
 function salvar(){
 
@@ -382,28 +400,28 @@ function salvar(){
   localStorage.setItem("segundos",segundos);
 
   localStorage.setItem(
-    "tituloPercentual",
-    document.getElementById("tituloPercentual").value
+    "tituloMeta",
+    document.getElementById("tituloMeta").value
   );
 
   localStorage.setItem(
-    "percentualControle",
-    document.getElementById("percentualControle").value
+    "controle",
+    document.getElementById("controle").value
   );
 
   localStorage.setItem(
-    "percentualPatrick",
-    document.getElementById("percentualPatrick").value
+    "patrick",
+    document.getElementById("patrick").value
   );
 
   localStorage.setItem(
-    "percentualBruna",
-    document.getElementById("percentualBruna").value
+    "bruna",
+    document.getElementById("bruna").value
   );
 
   localStorage.setItem(
-    "percentualNayara",
-    document.getElementById("percentualNayara").value
+    "nayara",
+    document.getElementById("nayara").value
   );
 
 }
@@ -439,6 +457,17 @@ function atualizarRanking(){
 function ligar(nome){
 
   vendedores[nome].d++;
+
+  let agora = new Date();
+
+  let hora =
+    agora.getHours().toString().padStart(2,"0");
+
+  let minuto =
+    agora.getMinutes().toString().padStart(2,"0");
+
+  document.getElementById("ultimaLigacao").innerText =
+    `Última ligação: ${nome} • ${hora}:${minuto}`;
 
   total++;
 
@@ -538,19 +567,19 @@ function resetarRanking(){
 
 setInterval(atualizarTimer,1000);
 
-document.getElementById("tituloPercentual")
+document.getElementById("tituloMeta")
 .addEventListener("input",salvar);
 
-document.getElementById("percentualControle")
+document.getElementById("controle")
 .addEventListener("input",salvar);
 
-document.getElementById("percentualPatrick")
+document.getElementById("patrick")
 .addEventListener("input",salvar);
 
-document.getElementById("percentualBruna")
+document.getElementById("bruna")
 .addEventListener("input",salvar);
 
-document.getElementById("percentualNayara")
+document.getElementById("nayara")
 .addEventListener("input",salvar);
 
 atualizarRanking();
@@ -558,4 +587,5 @@ atualizarRanking();
 </script>
 
 </body>
+
 </html>
