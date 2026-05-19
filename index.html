@@ -145,6 +145,21 @@ table input{
   text-align:center;
   font-weight:bold;
   outline:none;
+  width:55px;
+}
+
+.metaIdeal{
+  width:70px;
+  color:black;
+  font-size:20px;
+}
+
+.verde{
+  color:#00c853;
+}
+
+.vermelho{
+  color:red;
 }
 
 </style>
@@ -200,12 +215,10 @@ table input{
 
             <input
               type="number"
-              value="60"
-              style="
-                width:70px;
-                color:black;
-                font-size:20px;
-              "
+              id="metaIdeal"
+              class="metaIdeal"
+              value="70"
+              oninput="atualizarCores()"
             > %
 
           </td>
@@ -237,29 +250,13 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="54"
-              style="
-                width:55px;
-                color:red;
-              "
-            > %
-
+            <input type="number" value="54" class="metaCampo">
+            %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="61"
-              style="
-                width:55px;
-                color:#00c853;
-              "
-            > %
-
+            <input type="number" value="61" class="metaCampo">
+            %
           </td>
 
         </tr>
@@ -273,29 +270,13 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="33"
-              style="
-                width:55px;
-                color:red;
-              "
-            > %
-
+            <input type="number" value="33" class="metaCampo">
+            %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="32"
-              style="
-                width:55px;
-                color:red;
-              "
-            > %
-
+            <input type="number" value="32" class="metaCampo">
+            %
           </td>
 
         </tr>
@@ -309,34 +290,18 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="72"
-              style="
-                width:55px;
-                color:#00c853;
-              "
-            > %
-
+            <input type="number" value="72" class="metaCampo">
+            %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="73"
-              style="
-                width:55px;
-                color:#00c853;
-              "
-            > %
-
+            <input type="number" value="73" class="metaCampo">
+            %
           </td>
 
         </tr>
 
-        <!-- C. PRAGAS -->
+        <!-- PRAGAS -->
 
         <tr style="background:#efefef;color:black;">
 
@@ -345,29 +310,13 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="42"
-              style="
-                width:55px;
-                color:red;
-              "
-            > %
-
+            <input type="number" value="42" class="metaCampo">
+            %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="68"
-              style="
-                width:55px;
-                color:#00c853;
-              "
-            > %
-
+            <input type="number" value="68" class="metaCampo">
+            %
           </td>
 
         </tr>
@@ -381,29 +330,13 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="55"
-              style="
-                width:55px;
-                color:#00c853;
-              "
-            > %
-
+            <input type="number" value="55" class="metaCampo">
+            %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-
-            <input
-              type="number"
-              value="63"
-              style="
-                width:55px;
-                color:#00c853;
-              "
-            > %
-
+            <input type="number" value="63" class="metaCampo">
+            %
           </td>
 
         </tr>
@@ -523,7 +456,6 @@ let vendedores = {
 };
 
 let total = 0;
-
 let segundos = 0;
 
 function atualizarRanking(){
@@ -621,6 +553,40 @@ function atualizarTimer(){
 
 }
 
+function atualizarCores(){
+
+  let meta =
+    parseInt(
+      document.getElementById("metaIdeal").value
+    );
+
+  let limite = meta - 5;
+
+  let campos =
+    document.querySelectorAll(".metaCampo");
+
+  campos.forEach(campo=>{
+
+    let valor = parseInt(campo.value);
+
+    if(valor >= limite){
+
+      campo.classList.remove("vermelho");
+      campo.classList.add("verde");
+
+    }
+
+    else{
+
+      campo.classList.remove("verde");
+      campo.classList.add("vermelho");
+
+    }
+
+  });
+
+}
+
 function maisTempo(){
 
   segundos += 60;
@@ -661,7 +627,15 @@ function resetarRanking(){
 
 setInterval(atualizarTimer,1000);
 
+document.querySelectorAll(".metaCampo")
+.forEach(campo=>{
+
+  campo.addEventListener("input",atualizarCores);
+
+});
+
 atualizarRanking();
+atualizarCores();
 
 </script>
 
