@@ -250,13 +250,11 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="54" class="metaCampo">
-            %
+            <input type="number" value="54" class="metaCampo"> %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="61" class="metaCampo">
-            %
+            <input type="number" value="61" class="metaCampo"> %
           </td>
 
         </tr>
@@ -270,13 +268,11 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="33" class="metaCampo">
-            %
+            <input type="number" value="33" class="metaCampo"> %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="32" class="metaCampo">
-            %
+            <input type="number" value="32" class="metaCampo"> %
           </td>
 
         </tr>
@@ -290,13 +286,11 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="72" class="metaCampo">
-            %
+            <input type="number" value="72" class="metaCampo"> %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="73" class="metaCampo">
-            %
+            <input type="number" value="73" class="metaCampo"> %
           </td>
 
         </tr>
@@ -310,13 +304,11 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="42" class="metaCampo">
-            %
+            <input type="number" value="42" class="metaCampo"> %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="68" class="metaCampo">
-            %
+            <input type="number" value="68" class="metaCampo"> %
           </td>
 
         </tr>
@@ -330,13 +322,11 @@ table input{
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="55" class="metaCampo">
-            %
+            <input type="number" value="55" class="metaCampo"> %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="63" class="metaCampo">
-            %
+            <input type="number" value="63" class="metaCampo"> %
           </td>
 
         </tr>
@@ -407,6 +397,14 @@ table input{
         <button class="warning" onclick="maisTempo()">+</button>
         <button class="warning" onclick="menosTempo()">-</button>
 
+        <button onclick="togglePause()">
+          ⏸
+        </button>
+
+        <button onclick="desfazerLigacao()">
+          ↩
+        </button>
+
         <button class="danger" onclick="resetarTimer()">
           Timer
         </button>
@@ -458,6 +456,10 @@ let vendedores = {
 let total = 0;
 let segundos = 0;
 
+let pausado = false;
+
+let ultimaLigacao = null;
+
 function atualizarRanking(){
 
   let html = "";
@@ -490,6 +492,8 @@ function ligar(nome){
 
   vendedores[nome].d++;
 
+  ultimaLigacao = nome;
+
   let agora = new Date();
 
   let hora =
@@ -518,6 +522,10 @@ function ligar(nome){
 }
 
 function atualizarTimer(){
+
+  if(pausado){
+    return;
+  }
 
   segundos++;
 
@@ -584,6 +592,37 @@ function atualizarCores(){
     }
 
   });
+
+}
+
+function togglePause(){
+
+  pausado = !pausado;
+
+}
+
+function desfazerLigacao(){
+
+  if(!ultimaLigacao){
+    return;
+  }
+
+  if(vendedores[ultimaLigacao].d > 0){
+
+    vendedores[ultimaLigacao].d--;
+
+    total--;
+
+    if(total < 0){
+      total = 0;
+    }
+
+    document.getElementById("total").innerText =
+      total;
+
+    atualizarRanking();
+
+  }
 
 }
 
