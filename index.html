@@ -443,16 +443,48 @@ table input{
 </div>
     
 <div class="card">
-      <h2>💰 Ranking de Vendas</h2>
-      <div id="rankingVendas">
-        <div class="ranking-item"><span>1. Bruna</span><span>R$ 0,00</span></div>
-        <div class="ranking-item"><span>2. Lucas</span><span>R$ 0,00</span></div>
-        <div class="ranking-item"><span>3. Patrick</span><span>R$ 0,00</span></div>
-        <div class="ranking-item"><span>4. Nayara</span><span>R$ 0,00</span></div>
-        <div class="ranking-item"><span>5. Enrico</span><span>R$ 0,00</span></div>
-        <div class="ranking-item"><span>6. Leonardo</span><span>R$ 0,00</span></div>
-      </div>
-    </div>
+
+<h2>💰 Ranking de Vendas</h2>
+
+<div id="editarVendas">
+
+<div class="venda-input">
+<span>Bruna</span>
+<input type="number" value="5154" onchange="atualizarRankingVendas()">
+</div>
+
+<div class="venda-input">
+<span>Lucas</span>
+<input type="number" value="2250.66" onchange="atualizarRankingVendas()">
+</div>
+
+<div class="venda-input">
+<span>Patrick</span>
+<input type="number" value="1800" onchange="atualizarRankingVendas()">
+</div>
+
+<div class="venda-input">
+<span>Nayara</span>
+<input type="number" value="980" onchange="atualizarRankingVendas()">
+</div>
+
+<div class="venda-input">
+<span>Enrico</span>
+<input type="number" value="540" onchange="atualizarRankingVendas()">
+</div>
+
+<div class="venda-input">
+<span>Leonardo</span>
+<input type="number" value="250" onchange="atualizarRankingVendas()">
+</div>
+
+</div>
+
+<hr style="margin:15px 0;border-color:#333;">
+
+<div id="rankingVendas"></div>
+
+</div>
 
   </div>
 
