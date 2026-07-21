@@ -165,6 +165,31 @@ table input{
   color:red;
 }
 
+.venda-input{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:8px;
+gap:10px;
+}
+
+.venda-input span{
+font-weight:bold;
+font-size:16px;
+}
+
+.venda-input input{
+width:120px;
+background:#181818;
+border:none;
+color:#00ff95;
+padding:5px;
+text-align:right;
+font-size:16px;
+border-radius:6px;
+outline:none;
+}
+
 </style>
 
 </head>
@@ -524,16 +549,6 @@ let vendedores = {
   
 
 };
-let vendas = {
-
-  Lucas:{valor:2250.66},
-  Patrick:{valor:1800},
-  Bruna:{valor:5154},
-  Nayara:{valor:980},
-  Enrico:{valor:540},
-  Leonardo:{valor:250}
-
-};
 
 let total = 0;
 let segundos = 0;
@@ -543,7 +558,55 @@ let pausado = false;
 let ultimaLigacao = null;
 
 function atualizarRanking(){
+function atualizarRankingVendas(){
 
+let lista=[];
+
+document.querySelectorAll("#editarVendas .venda-input").forEach(item=>{
+
+let nome=item.querySelector("span").innerText;
+
+let valor=parseFloat(item.querySelector("input").value)||0;
+
+lista.push({
+nome,
+valor
+});
+
+});
+
+lista.sort((a,b)=>b.valor-a.valor);
+
+let html="";
+
+lista.forEach((v,i)=>{
+
+let medalha=(i+1)+"º";
+
+if(i==0) medalha="🥇";
+if(i==1) medalha="🥈";
+if(i==2) medalha="🥉";
+
+html+=`
+
+<div class="ranking-item">
+
+<span>${medalha} ${v.nome}</span>
+
+<span>${v.valor.toLocaleString("pt-BR",{
+style:"currency",
+currency:"BRL"
+})}</span>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("rankingVendas").innerHTML=html;
+
+}
   let html = "";
 
   Object.entries(vendedores)
@@ -756,6 +819,7 @@ document.querySelectorAll(".metaCampo")
 });
 
 atualizarRanking();
+atualizarRankingVendas();
 atualizarCores();
 
 </script>
