@@ -373,6 +373,24 @@ table input{
       Os clientes não vão ligar sozinhos.
     </div>
 
+    <div class="card" style="position:absolute;bottom:20px;width:90%;">
+      <h2>🎮 Controle</h2>
+      <div class="button-grid">
+        <button onclick="ligar('Lucas')">Lucas</button>
+        <button onclick="ligar('Patrick')">Patrick</button>
+        <button onclick="ligar('Bruna')">Bruna</button>
+        <button onclick="ligar('Nayara')">Nayara</button>
+        <button onclick="ligar('Enrico')">Enrico</button>
+        <button onclick="ligar('Leonardo')">Leo</button>
+        <button class="warning" onclick="maisTempo()">+</button>
+        <button class="warning" onclick="menosTempo()">-</button>
+        <button onclick="togglePause()">⏸</button>
+        <button onclick="desfazerLigacao()">↩</button>
+        <button class="danger" onclick="resetarTimer()">Timer</button>
+        <button class="danger" onclick="resetarRanking()">Diário</button>
+      </div>
+    </div>
+
   </div>
 
   <!-- DIREITA -->
@@ -424,46 +442,20 @@ table input{
 </div>
     
 <div class="card">
-    <h2>🎮 Controle</h2>
-
-    <div class="button-grid">
-        ...
-    </div>
-</div>
-
-        <button onclick="ligar('Lucas')">Lucas</button>
-
-        <button onclick="ligar('Patrick')">Patrick</button>
-        <button onclick="ligar('Bruna')">Bruna</button>
-
-        <button onclick="ligar('Nayara')">Nayara</button>
-        <button onclick="ligar('Enrico')">Enrico</button>
-        <button onclick="ligar('Leonardo')">Leo</button>
-
-        <button class="warning" onclick="maisTempo()">+</button>
-        <button class="warning" onclick="menosTempo()">-</button>
-
-        <button onclick="togglePause()">
-          ⏸
-        </button>
-
-        <button onclick="desfazerLigacao()">
-          ↩
-        </button>
-
-        <button class="danger" onclick="resetarTimer()">
-          Timer
-        </button>
-
-        <button class="danger" onclick="resetarRanking()">
-          Diário
-        </button>
-
+      <h2>💰 Ranking de Vendas</h2>
+      <div id="rankingVendas">
+        <div class="ranking-item"><span>1. Bruna</span><span>R$ 0,00</span></div>
+        <div class="ranking-item"><span>2. Lucas</span><span>R$ 0,00</span></div>
+        <div class="ranking-item"><span>3. Patrick</span><span>R$ 0,00</span></div>
+        <div class="ranking-item"><span>4. Nayara</span><span>R$ 0,00</span></div>
+        <div class="ranking-item"><span>5. Enrico</span><span>R$ 0,00</span></div>
+        <div class="ranking-item"><span>6. Leonardo</span><span>R$ 0,00</span></div>
       </div>
-
     </div>
 
   </div>
+
+</div>
 
 </div>
 
@@ -499,6 +491,7 @@ let vendedores = {
   
 
 };
+let vendas = {
 
   Lucas:{valor:2250.66},
   Patrick:{valor:1800},
@@ -506,7 +499,7 @@ let vendedores = {
   Nayara:{valor:980},
   Enrico:{valor:540},
   Leonardo:{valor:250}
-  
+
 };
 
 let total = 0;
