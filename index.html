@@ -551,7 +551,7 @@ let vendedores = {
   Bruna:{d:0},
   Nayara:{d:0},
   Enrico:{d:0},
-  Leonardo:{d:0}
+  Leonardo:{d:0},
   Pedro:{d:0}
   
 
@@ -565,81 +565,67 @@ let pausado = false;
 let ultimaLigacao = null;
 
 function atualizarRanking(){
-function atualizarRankingVendas(){
 
-let lista=[];
-
-document.querySelectorAll("#editarVendas .venda-input").forEach(item=>{
-
-let nome=item.querySelector("span").innerText;
-
-let valor=parseFloat(item.querySelector("input").value)||0;
-
-lista.push({
-nome,
-valor
-});
-
-});
-
-lista.sort((a,b)=>b.valor-a.valor);
-
-let html="";
-
-lista.forEach((v,i)=>{
-
-let medalha=(i+1)+"º";
-
-if(i==0) medalha="🥇";
-if(i==1) medalha="🥈";
-if(i==2) medalha="🥉";
-
-html+=`
-
-<div class="ranking-item">
-
-<span>${medalha} ${v.nome}</span>
-
-<span>${v.valor.toLocaleString("pt-BR",{
-style:"currency",
-currency:"BRL"
-})}</span>
-
-</div>
-
-`;
-
-});
-
-document.getElementById("rankingVendas").innerHTML=html;
-
-}
   let html = "";
 
   Object.entries(vendedores)
+    .sort((a,b)=>b[1].d-a[1].d)
+    .forEach((v,i)=>{
 
-  .sort((a,b)=>b[1].d-a[1].d)
+      html += `
+        <div class="ranking-item">
+          <span>${i+1}. ${v[0]}</span>
+          <span>${v[1].d}</span>
+        </div>
+      `;
 
-  .forEach((v,i)=>{
-
-    html += `
-
-      <div class="ranking-item">
-
-        <span>${i+1}. ${v[0]}</span>
-
-        <span>${v[1].d}</span>
-
-      </div>
-
-    `;
-
-  });
+    });
 
   document.getElementById("ranking").innerHTML = html;
 
 }
 
+function atualizarRankingVendas(){
+
+  let lista=[];
+
+  document.querySelectorAll("#editarVendas .venda-input").forEach(item=>{
+
+    lista.push({
+      nome:item.querySelector("span").innerText,
+      valor:parseFloat(item.querySelector("input").value) || 0
+    });
+
+  });
+
+  lista.sort((a,b)=>b.valor-a.valor);
+
+  let html="";
+
+  lista.forEach((v,i)=>{
+
+    let medalha=(i+1)+"º";
+
+    if(i==0) medalha="🥇";
+    if(i==1) medalha="🥈";
+    if(i==2) medalha="🥉";
+
+    html += `
+      <div class="ranking-item">
+        <span>${medalha} ${v.nome}</span>
+        <span>${v.valor.toLocaleString("pt-BR",{
+          style:"currency",
+          currency:"BRL"
+        })}</span>
+      </div>
+    `;
+
+  });
+
+  document.getElementById("rankingVendas").innerHTML = html;
+
+}
+  
 function ligar(nome){
 
   vendedores[nome].d++;
