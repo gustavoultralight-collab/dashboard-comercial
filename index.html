@@ -472,47 +472,6 @@ outline:none;
 
 <h2>💰 Ranking de Vendas</h2>
 
-<div id="editarVendas">
-
-<div class="venda-input">
-<span>Bruna</span>
-<input type="number" value="5154" onchange="atualizarRankingVendas()">
-</div>
-
-<div class="venda-input">
-<span>Lucas</span>
-<input type="number" value="2250.66" onchange="atualizarRankingVendas()">
-</div>
-
-<div class="venda-input">
-<span>Patrick</span>
-<input type="number" value="1800" onchange="atualizarRankingVendas()">
-</div>
-
-<div class="venda-input">
-<span>Nayara</span>
-<input type="number" value="980" onchange="atualizarRankingVendas()">
-</div>
-
-<div class="venda-input">
-<span>Enrico</span>
-<input type="number" value="540" onchange="atualizarRankingVendas()">
-</div>
-
-<div class="venda-input">
-<span>Leonardo</span>
-<input type="number" value="250" onchange="atualizarRankingVendas()">
-</div>
-  
-<div class="venda-input">
-<span>Pedro</span>
-<input type="number" value="0" onchange="atualizarRankingVendas()">
-</div>
-  
-</div>
-
-<hr style="margin:15px 0;border-color:#333;">
-
 <div id="rankingVendas"></div>
 
 </div>
@@ -587,42 +546,74 @@ function atualizarRanking(){
 
 function atualizarRankingVendas(){
 
-  let lista=[];
+    let lista=[];
 
-  document.querySelectorAll("#editarVendas .venda-input").forEach(item=>{
+    Object.entries(vendas).forEach(([nome,dados])=>{
 
-    lista.push({
-      nome:item.querySelector("span").innerText,
-      valor:parseFloat(item.querySelector("input").value) || 0
+        lista.push({
+            nome,
+            valor:dados.valor
+        });
+
     });
 
-  });
+    lista.sort((a,b)=>b.valor-a.valor);
 
-  lista.sort((a,b)=>b.valor-a.valor);
+    let html="";
 
-  let html="";
+    lista.forEach((v,i)=>{
 
-  lista.forEach((v,i)=>{
+        let medalha=(i+1)+"º";
 
-    let medalha=(i+1)+"º";
+        if(i==0) medalha="🥇";
+        if(i==1) medalha="🥈";
+        if(i==2) medalha="🥉";
 
-    if(i==0) medalha="🥇";
-    if(i==1) medalha="🥈";
-    if(i==2) medalha="🥉";
+        html+=`
 
-    html += `
-      <div class="ranking-item">
-        <span>${medalha} ${v.nome}</span>
-        <span>${v.valor.toLocaleString("pt-BR",{
-          style:"currency",
-          currency:"BRL"
-        })}</span>
-      </div>
-    `;
+        <div class="ranking-item">
 
-  });
+            <span>${medalha} ${v.nome}</span>
 
-  document.getElementById("rankingVendas").innerHTML = html;
+            <div style="display:flex;align-items:center;gap:8px;">
+
+                <button
+                onclick="alterarVenda('${v.nome}',-1)"
+                ondblclick="alterarVenda('${v.nome}',-1000)">◀</button>
+
+                <span style="min-width:120px;text-align:right;">
+
+                ${v.valor.toLocaleString('pt-BR',{
+                    style:'currency',
+                    currency:'BRL'
+                })}
+
+                </span>
+
+                <button
+                onclick="alterarVenda('${v.nome}',1)"
+                ondblclick="alterarVenda('${v.nome}',1000)">▶</button>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    document.getElementById("rankingVendas").innerHTML=html;
+
+}
+
+function alterarVenda(nome,valor){
+
+    vendas[nome].valor += valor;
+
+    if(vendas[nome].valor<0)
+        vendas[nome].valor=0;
+
+    atualizarRankingVendas();
 
 }
   
