@@ -107,21 +107,21 @@ body{
 
 .button-grid{
   display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:6px;
-  margin-top:10px;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+  margin-top:5px;
 }
 
 button{
-  padding:4px;
+  padding:2px;
   border:none;
-  border-radius:6px;
+  border-radius:5px;
   background:#00ff95;
   color:black;
-  font-size:12px;
+  font-size:10px;
   font-weight:bold;
   cursor:pointer;
-  height:30px;
+  height:25px;
 }
 
 .warning{
@@ -408,6 +408,7 @@ outline:none;
         <button onclick="ligar('Nayara')">Nayara</button>
         <button onclick="ligar('Enrico')">Enrico</button>
         <button onclick="ligar('Leonardo')">Leo</button>
+        <button onclick="ligar('Pedro')">Pedro</button>
         <button class="warning" onclick="maisTempo()">+</button>
         <button class="warning" onclick="menosTempo()">-</button>
         <button onclick="togglePause()">⏸</button>
@@ -502,7 +503,12 @@ outline:none;
 <span>Leonardo</span>
 <input type="number" value="250" onchange="atualizarRankingVendas()">
 </div>
-
+  
+<div class="venda-input">
+<span>Pedro</span>
+<input type="number" value="0" onchange="atualizarRankingVendas()">
+</div>
+  
 </div>
 
 <hr style="margin:15px 0;border-color:#333;">
@@ -546,6 +552,7 @@ let vendedores = {
   Nayara:{d:0},
   Enrico:{d:0},
   Leonardo:{d:0}
+  Pedro:{d:0}
   
 
 };
