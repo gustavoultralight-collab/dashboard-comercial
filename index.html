@@ -818,6 +818,43 @@ atualizarRanking();
 atualizarRankingVendas();
 atualizarCores();
 
+// === Ligações via tecla de atalho (ntfy.sh) ===
+// Cada vendedor tem um script que envia o próprio nome para este
+// tópico quando aperta a tecla. Aqui a TV escuta em tempo real e
+// chama ligar(nome), como se tivesse clicado o botão manualmente.
+
+const NTFY_TOPIC = "ultralight-ligacoes-032c72fdfce56a85";
+
+function conectarLigacoesRemotas(){
+
+  const fonte = new EventSource(`https://ntfy.sh/${NTFY_TOPIC}/sse`);
+
+  fonte.onmessage = function(evento){
+
+    try{
+
+      const dados = JSON.parse(evento.data);
+      const nome = (dados.message || "").trim();
+
+      if(vendedores.hasOwnProperty(nome)){
+        ligar(nome);
+      }
+
+    }catch(erro){
+      console.error("Falha ao processar ligação remota:", erro);
+    }
+
+  };
+
+  fonte.onerror = function(){
+    // EventSource reconecta sozinho; só deixamos registrado.
+    console.warn("Conexão de ligações remotas caiu, reconectando...");
+  };
+
+}
+
+conectarLigacoesRemotas();
+
 </script>
 
 </body>
