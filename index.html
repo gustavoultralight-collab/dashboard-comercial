@@ -190,6 +190,55 @@ border-radius:6px;
 outline:none;
 }
 
+.venda-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.85);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.4s ease;
+  text-align:center;
+  padding:40px;
+}
+
+.venda-overlay.ativo{
+  opacity:1;
+}
+
+.venda-overlay .venda-titulo{
+  font-size:80px;
+  font-weight:bold;
+  color:#00ff95;
+  margin-bottom:20px;
+  animation:pulseVenda 0.6s ease infinite alternate;
+}
+
+.venda-overlay .venda-valor{
+  font-size:110px;
+  font-weight:bold;
+  color:#ffd700;
+  margin-bottom:20px;
+}
+
+.venda-overlay .venda-mensagem{
+  font-size:40px;
+  color:white;
+  max-width:80%;
+}
+
+@keyframes pulseVenda{
+  from{ transform:scale(1); }
+  to{ transform:scale(1.06); }
+}
+
 </style>
 
 </head>
@@ -485,6 +534,16 @@ outline:none;
 <audio id="som">
   <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg">
 </audio>
+
+<audio id="somVenda">
+  <source src="https://actions.google.com/sounds/v1/crowds/team_cheer.ogg">
+</audio>
+
+<div class="venda-overlay" id="vendaOverlay">
+  <div class="venda-titulo" id="vendaTitulo">🎉 VENDA! 🎉</div>
+  <div class="venda-valor" id="vendaValor">R$ 0,00</div>
+  <div class="venda-mensagem" id="vendaMensagem"></div>
+</div>
 
 <script>
 
@@ -854,6 +913,73 @@ function conectarLigacoesRemotas(){
 }
 
 conectarLigacoesRemotas();
+
+// === Vendas via tecla de atalho (ntfy.sh) ===
+// O consultor aperta a tecla, digita o valor da venda (e uma
+// mensagem opcional) numa telinha no próprio PC, e isso chega
+// aqui via este segundo tópico. Mostramos um overlay comemorativo
+// com som e somamos o valor no ranking de vendas já existente.
+
+const NTFY_TOPIC_VENDAS = "ultralight-vendas-c56ec50edb6b8ca0";
+
+function mostrarVenda(nome, valor, mensagem){
+
+  document.getElementById("vendaTitulo").innerText =
+    `🎉 ${nome} VENDEU! 🎉`;
+
+  document.getElementById("vendaValor").innerText =
+    valor.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+
+  document.getElementById("vendaMensagem").innerText =
+    mensagem || "";
+
+  const overlay = document.getElementById("vendaOverlay");
+  overlay.classList.add("ativo");
+
+  const somVenda = document.getElementById("somVenda");
+  somVenda.currentTime = 0;
+  somVenda.play();
+
+  clearTimeout(window._vendaTimeout);
+  window._vendaTimeout = setTimeout(()=>{
+    overlay.classList.remove("ativo");
+  }, 6000);
+
+}
+
+function conectarVendasRemotas(){
+
+  const fonte = new EventSource(`https://ntfy.sh/${NTFY_TOPIC_VENDAS}/sse`);
+
+  fonte.onmessage = function(evento){
+
+    try{
+
+      const dados = JSON.parse(evento.data);
+      const payload = JSON.parse(dados.message);
+
+      const nome = payload.nome;
+      const valor = parseFloat(payload.valor) || 0;
+      const mensagem = payload.mensagem || "";
+
+      if(vendas.hasOwnProperty(nome) && valor > 0){
+        alterarVenda(nome, valor);
+        mostrarVenda(nome, valor, mensagem);
+      }
+
+    }catch(erro){
+      console.error("Falha ao processar venda remota:", erro);
+    }
+
+  };
+
+  fonte.onerror = function(){
+    console.warn("Conexão de vendas remotas caiu, reconectando...");
+  };
+
+}
+
+conectarVendasRemotas();
 
 </script>
 
