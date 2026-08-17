@@ -936,9 +936,11 @@ function mostrarVenda(nome, valor, mensagem){
   const overlay = document.getElementById("vendaOverlay");
   overlay.classList.add("ativo");
 
-  const somVenda = document.getElementById("somVenda");
-  somVenda.currentTime = 0;
-  somVenda.play();
+  const somOriginal = document.getElementById("somVenda");
+  const somVenda = somOriginal.cloneNode(true);
+  somVenda.play().catch(erro=>{
+    console.warn("Não foi possível tocar o som da venda:", erro);
+  });
 
   clearTimeout(window._vendaTimeout);
   window._vendaTimeout = setTimeout(()=>{
