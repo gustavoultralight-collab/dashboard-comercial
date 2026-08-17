@@ -535,9 +535,6 @@ outline:none;
   <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg">
 </audio>
 
-<audio id="somVenda">
-  <source src="pwlpl-applause-sound-effect-521104.mp3">
-</audio>
 
 <div class="venda-overlay" id="vendaOverlay">
   <div class="venda-titulo" id="vendaTitulo">🎉 VENDA! 🎉</div>
@@ -922,6 +919,59 @@ conectarLigacoesRemotas();
 
 const NTFY_TOPIC_VENDAS = "ultralight-vendas-c56ec50edb6b8ca0";
 
+// Carrega o som de venda uma única vez na memória (Web Audio API).
+// Tocar via AudioBufferSourceNode evita os problemas de recarregar/
+// clonar um <audio> repetidamente (que trava depois de algumas vendas).
+
+let audioCtxVenda = null;
+let somVendaBuffer = null;
+
+function inicializarSomVenda(){
+
+  audioCtxVenda = new (window.AudioContext || window.webkitAudioContext)();
+
+  fetch("pwlpl-applause-sound-effect-521104.mp3")
+    .then(resposta => resposta.arrayBuffer())
+    .then(dados => audioCtxVenda.decodeAudioData(dados))
+    .then(buffer => {
+      somVendaBuffer = buffer;
+    })
+    .catch(erro => {
+      console.error("Falha ao carregar o som de venda:", erro);
+    });
+
+}
+
+function tocarSomVenda(){
+
+  if(!audioCtxVenda || !somVendaBuffer){
+    return;
+  }
+
+  if(audioCtxVenda.state === "suspended"){
+    audioCtxVenda.resume();
+  }
+
+  const fonte = audioCtxVenda.createBufferSource();
+  fonte.buffer = somVendaBuffer;
+  fonte.connect(audioCtxVenda.destination);
+  fonte.start(0);
+
+}
+
+inicializarSomVenda();
+
+// Navegadores só permitem áudio depois de uma interação na página.
+// Como a TV normalmente não recebe cliques, isso libera o som assim
+// que alguém tocar em qualquer lugar da tela pelo menos uma vez.
+["click","touchstart","keydown"].forEach(evento=>{
+  document.addEventListener(evento, ()=>{
+    if(audioCtxVenda && audioCtxVenda.state === "suspended"){
+      audioCtxVenda.resume();
+    }
+  }, { once:true });
+});
+
 function mostrarVenda(nome, valor, mensagem){
 
   document.getElementById("vendaTitulo").innerText =
@@ -936,11 +986,7 @@ function mostrarVenda(nome, valor, mensagem){
   const overlay = document.getElementById("vendaOverlay");
   overlay.classList.add("ativo");
 
-  const somOriginal = document.getElementById("somVenda");
-  const somVenda = somOriginal.cloneNode(true);
-  somVenda.play().catch(erro=>{
-    console.warn("Não foi possível tocar o som da venda:", erro);
-  });
+  tocarSomVenda();
 
   clearTimeout(window._vendaTimeout);
   window._vendaTimeout = setTimeout(()=>{
