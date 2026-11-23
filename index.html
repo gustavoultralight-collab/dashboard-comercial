@@ -234,6 +234,89 @@ outline:none;
   max-width:80%;
 }
 
+.editor-vendas{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.editor-vendas.ativo{
+  display:flex;
+}
+
+.editor-caixa{
+  background:#101010;
+  border:2px solid #00ff95;
+  border-radius:20px;
+  padding:30px;
+  width:460px;
+  max-width:90%;
+}
+
+.editor-caixa h2{
+  margin-bottom:20px;
+  font-size:26px;
+}
+
+.editor-linha{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.editor-linha{
+  gap:12px;
+}
+
+.editor-linha input{
+  width:200px;
+  min-width:0;
+  flex:0 1 200px;
+  background:#181818;
+  border:2px solid #333;
+  color:#00ff95;
+  padding:8px 10px;
+  text-align:right;
+  font-size:22px;
+  font-weight:bold;
+  border-radius:8px;
+  outline:none;
+}
+
+.editor-linha input:focus{
+  border-color:#00ff95;
+}
+
+.editor-linha input.invalido{
+  border-color:red;
+}
+
+.editor-erro{
+  color:red;
+  font-weight:bold;
+  min-height:22px;
+  margin:6px 0;
+}
+
+.editor-botoes{
+  display:flex;
+  gap:12px;
+  justify-content:flex-end;
+}
+
+.editor-botoes button{
+  height:44px;
+  padding:0 26px;
+  font-size:18px;
+}
+
 @keyframes pulseVenda{
   from{ transform:scale(1); }
   to{ transform:scale(1.06); }
@@ -463,6 +546,8 @@ outline:none;
         <button onclick="desfazerLigacao()">↩</button>
         <button class="danger" onclick="resetarTimer()">Timer</button>
         <button class="danger" onclick="resetarRanking()">Diário</button>
+        <button onclick="abrirEditorVendas()">Vendas</button>
+        <button class="danger" onclick="zerarVendas()">Zerar vendas</button>
       </div>
     </div>
 
@@ -512,12 +597,6 @@ outline:none;
     R$ 0,00
   </div>
 
-  <button
-    class="danger"
-    onclick="zerarVendas()"
-    style="margin-top:8px;padding:2px 12px;"
-  >Zerar vendas</button>
-
 </div>
     
 <div class="card">
@@ -543,6 +622,18 @@ outline:none;
   <div class="venda-titulo" id="vendaTitulo">🎉 VENDA! 🎉</div>
   <div class="venda-valor" id="vendaValor">R$ 0,00</div>
   <div class="venda-mensagem" id="vendaMensagem"></div>
+</div>
+
+<div class="editor-vendas" id="editorVendas">
+  <div class="editor-caixa">
+    <h2>💰 Vendas de cada consultor</h2>
+    <div id="editorCampos"></div>
+    <div class="editor-erro" id="editorErro"></div>
+    <div class="editor-botoes">
+      <button class="danger" onclick="fecharEditorVendas()">Cancelar</button>
+      <button onclick="salvarEditorVendas()">Salvar</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -681,7 +772,178 @@ function atualizarRankingVendas(){
             currency:'BRL'
         });
 
+    salvarVendasNaTV();
+
 }
+
+// === Vendas guardadas no navegador da TV ===
+// Assim um F5 ou a TV reiniciando não apaga as vendas.
+// Só zera quando alguém aperta "Zerar vendas".
+
+const CHAVE_VENDAS = "dashboardComercialVendas";
+
+function salvarVendasNaTV(){
+
+    try{
+        localStorage.setItem(CHAVE_VENDAS, JSON.stringify(vendas));
+    }catch(erro){}
+
+}
+
+function carregarVendasDaTV(){
+
+    try{
+
+        const salvo = JSON.parse(localStorage.getItem(CHAVE_VENDAS));
+
+        if(!salvo){
+            return;
+        }
+
+        for(let n in vendas){
+            if(salvo[n] && typeof salvo[n].valor === "number"){
+                vendas[n].valor = salvo[n].valor;
+            }
+        }
+
+    }catch(erro){}
+
+}
+
+// Lê "5000", "5.000", "5.000,00", "R$ 5.000,50", "1500.50"...
+// Campo vazio = 0. Devolve null se não der para entender.
+function lerValorDigitado(texto){
+
+    let v = String(texto).trim();
+
+    if(v === ""){
+        return 0;
+    }
+
+    v = v.replace(/[^0-9,.]/g, "");
+
+    if(v === ""){
+        return null;
+    }
+
+    if(v.includes(",") && v.includes(".")){
+
+        if(v.lastIndexOf(",") > v.lastIndexOf(".")){
+            v = v.replace(/\./g, "").replace(",", ".");
+        }else{
+            v = v.replace(/,/g, "");
+        }
+
+    }else{
+
+        v = v.replace(/,/g, ".");
+
+        const qtd = (v.match(/\./g) || []).length;
+
+        if(qtd > 1 || /\.\d{3}$/.test(v)){
+            v = v.replace(/\./g, "");
+        }
+
+    }
+
+    if(!/^\d+(\.\d{1,2})?$/.test(v)){
+        return null;
+    }
+
+    return Math.round(parseFloat(v) * 100) / 100;
+
+}
+
+function abrirEditorVendas(){
+
+    let html = "";
+
+    for(let n in vendas){
+
+        const atual = vendas[n].valor.toLocaleString('pt-BR',{
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        });
+
+        html += `
+          <div class="editor-linha">
+            <span>${n}</span>
+            <input type="text" inputmode="decimal" data-nome="${n}" value="${atual}">
+          </div>
+        `;
+
+    }
+
+    document.getElementById("editorCampos").innerHTML = html;
+    document.getElementById("editorErro").innerText = "";
+    document.getElementById("editorVendas").classList.add("ativo");
+
+    const primeiro = document.querySelector("#editorCampos input");
+    if(primeiro){
+        primeiro.focus();
+        primeiro.select();
+    }
+
+}
+
+function fecharEditorVendas(){
+
+    document.getElementById("editorVendas").classList.remove("ativo");
+
+}
+
+function salvarEditorVendas(){
+
+    const campos = document.querySelectorAll("#editorCampos input");
+    const novos = {};
+    let erro = false;
+
+    campos.forEach(campo=>{
+
+        const valor = lerValorDigitado(campo.value);
+
+        if(valor === null){
+            campo.classList.add("invalido");
+            erro = true;
+        }else{
+            campo.classList.remove("invalido");
+            novos[campo.dataset.nome] = valor;
+        }
+
+    });
+
+    if(erro){
+        document.getElementById("editorErro").innerText =
+            "Valor inválido no campo em vermelho (ex.: 5.000,00).";
+        return;
+    }
+
+    for(let n in novos){
+        vendas[n].valor = novos[n];
+    }
+
+    atualizarRankingVendas();
+    fecharEditorVendas();
+
+}
+
+// Enter salva, Esc cancela
+document.addEventListener("keydown", evento=>{
+
+    if(!document.getElementById("editorVendas").classList.contains("ativo")){
+        return;
+    }
+
+    if(evento.key === "Enter"){
+        evento.preventDefault();
+        salvarEditorVendas();
+    }
+
+    if(evento.key === "Escape"){
+        fecharEditorVendas();
+    }
+
+});
 
 function zerarVendas(){
 
@@ -960,6 +1222,8 @@ document.querySelectorAll(".metaCampo")
   campo.addEventListener("input",atualizarCores);
 
 });
+
+carregarVendasDaTV();
 
 atualizarRanking();
 atualizarRankingVendas();
