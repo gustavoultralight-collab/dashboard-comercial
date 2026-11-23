@@ -1279,27 +1279,64 @@ const NTFY_TOPIC_VENDAS = "ultralight-vendas-c56ec50edb6b8ca0";
 // clonar um <audio> repetidamente (que trava depois de algumas vendas).
 
 let audioCtxVenda = null;
-let somVendaBuffer = null;
+
+const SOM_VENDA_PADRAO = "pwlpl-applause-sound-effect-521104.mp3";
+
+// Áudios especiais de venda: a primeira regra que bater toca
+// NO LUGAR do aplauso. Para criar outra, acrescente uma linha:
+//   nome      = consultor (igual ao do placar)
+//   abaixoDe  = toca quando a venda for MENOR que esse valor
+//   arquivo   = mp3 na mesma pasta do index.html
+const AUDIOS_ESPECIAIS_VENDA = [
+  { nome:"Patrick", abaixoDe:200, arquivo:"venda-patrick-abaixo-200.mp3" }
+];
+
+let buffersAudio = {};
+
+function carregarAudio(arquivo){
+
+  fetch(arquivo)
+    .then(resposta => resposta.arrayBuffer())
+    .then(dados => audioCtxVenda.decodeAudioData(dados))
+    .then(buffer => {
+      buffersAudio[arquivo] = buffer;
+    })
+    .catch(erro => {
+      console.error(`Falha ao carregar o áudio ${arquivo}:`, erro);
+    });
+
+}
 
 function inicializarSomVenda(){
 
   audioCtxVenda = new (window.AudioContext || window.webkitAudioContext)();
 
-  fetch("pwlpl-applause-sound-effect-521104.mp3")
-    .then(resposta => resposta.arrayBuffer())
-    .then(dados => audioCtxVenda.decodeAudioData(dados))
-    .then(buffer => {
-      somVendaBuffer = buffer;
-    })
-    .catch(erro => {
-      console.error("Falha ao carregar o som de venda:", erro);
-    });
+  carregarAudio(SOM_VENDA_PADRAO);
+
+  AUDIOS_ESPECIAIS_VENDA.forEach(regra => carregarAudio(regra.arquivo));
 
 }
 
-function tocarSomVenda(){
+function escolherSomVenda(nome, valor){
 
-  if(!audioCtxVenda || !somVendaBuffer){
+  const regra = AUDIOS_ESPECIAIS_VENDA.find(r =>
+    r.nome === nome &&
+    (r.abaixoDe === undefined || valor < r.abaixoDe)
+  );
+
+  if(regra && buffersAudio[regra.arquivo]){
+    return regra.arquivo;
+  }
+
+  return SOM_VENDA_PADRAO;
+
+}
+
+function tocarSomVenda(nome, valor){
+
+  const buffer = buffersAudio[escolherSomVenda(nome, valor)];
+
+  if(!audioCtxVenda || !buffer){
     return;
   }
 
@@ -1308,7 +1345,7 @@ function tocarSomVenda(){
   }
 
   const fonte = audioCtxVenda.createBufferSource();
-  fonte.buffer = somVendaBuffer;
+  fonte.buffer = buffer;
   fonte.connect(audioCtxVenda.destination);
   fonte.start(0);
 
@@ -1341,7 +1378,7 @@ function mostrarVenda(nome, valor, mensagem){
   const overlay = document.getElementById("vendaOverlay");
   overlay.classList.add("ativo");
 
-  tocarSomVenda();
+  tocarSomVenda(nome, valor);
 
   clearTimeout(window._vendaTimeout);
   window._vendaTimeout = setTimeout(()=>{
