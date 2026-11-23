@@ -318,20 +318,20 @@ outline:none;
 
         </tr>
 
-        <!-- BRUNA -->
+        <!-- LEONARDO -->
 
         <tr style="background:#efefef;color:black;">
 
           <td style="padding:8px;border:1px solid #222;">
-            BRUNA
+            LEONARDO
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="58" class="metaCampo"> %
+            <input type="number" value="38" class="metaCampo"> %
           </td>
 
           <td style="padding:8px;border:1px solid #222;">
-            <input type="number" value="61" class="metaCampo"> %
+            <input type="number" value="60" class="metaCampo"> %
           </td>
 
         </tr>
@@ -453,7 +453,6 @@ outline:none;
       <div class="button-grid">
         <button onclick="ligar('Lucas')">Lucas</button>
         <button onclick="ligar('Patrick')">Patrick</button>
-        <button onclick="ligar('Bruna')">Bruna</button>
         <button onclick="ligar('Nayara')">Nayara</button>
         <button onclick="ligar('Enrico')">Enrico</button>
         <button onclick="ligar('Leonardo')">Leo</button>
@@ -495,25 +494,29 @@ outline:none;
     
 <div class="card">
 
-  <h2>💰 Meta Diária</h2>
+  <h2>💰 Total de Vendas</h2>
 
-  <input
-    type="text"
-    id="metaDiaria"
-    value="R$ 0"
+  <div
+    id="totalVendas"
     style="
       width:100%;
       background:#181818;
       color:#00ff95;
-      border:none;
       border-radius:10px;
       padding:15px;
       text-align:center;
       font-size:36px;
       font-weight:bold;
-      outline:none;
     "
   >
+    R$ 0,00
+  </div>
+
+  <button
+    class="danger"
+    onclick="zerarVendas()"
+    style="margin-top:8px;padding:2px 12px;"
+  >Zerar vendas</button>
 
 </div>
     
@@ -563,7 +566,6 @@ let vendedores = {
 
   Lucas:{d:0},
   Patrick:{d:0},
-  Bruna:{d:0},
   Nayara:{d:0},
   Enrico:{d:0},
   Leonardo:{d:0},
@@ -574,7 +576,6 @@ let vendedores = {
 
   let vendas = {
 
-  Bruna:{valor:5147},
   Lucas:{valor:2250.66},
   Patrick:{valor:1800},
   Nayara:{valor:980},
@@ -672,6 +673,28 @@ function atualizarRankingVendas(){
 
     document.getElementById("rankingVendas").innerHTML=html;
 
+    let soma = lista.reduce((t,v)=>t+v.valor,0);
+
+    document.getElementById("totalVendas").innerText =
+        soma.toLocaleString('pt-BR',{
+            style:'currency',
+            currency:'BRL'
+        });
+
+}
+
+function zerarVendas(){
+
+    if(!confirm("Zerar as vendas de todos os consultores?")){
+        return;
+    }
+
+    for(let n in vendas){
+        vendas[n].valor = 0;
+    }
+
+    atualizarRankingVendas();
+
 }
 
 function alterarVenda(nome,valor){
@@ -718,6 +741,72 @@ function ligar(nome){
 
 }
 
+// === Apito de 20 minutos sem ligação ===
+// Aos 20:00 toca o alarme inteiro uma vez (como sempre foi).
+// Depois, enquanto ninguém ligar: apita 3 segundos, fica 30 em
+// silêncio e apita de novo. Uma ligação zera o timer e cala o apito.
+
+const LIMITE_SEM_LIGACAO = 1200; // 20 minutos
+const APITO_CURTO_SEG = 3;
+const PAUSA_APITO_SEG = 30;
+
+let proximoApito = null;
+let cortarApito = null;
+
+function tocarApito(duracaoSeg){
+
+  const som = document.getElementById("som");
+
+  clearTimeout(cortarApito);
+  som.currentTime = 0;
+  som.play().catch(()=>{});
+
+  if(duracaoSeg){
+    cortarApito = setTimeout(()=>som.pause(), duracaoSeg*1000);
+  }
+
+}
+
+function pararApito(){
+
+  if(proximoApito === null){
+    return;
+  }
+
+  proximoApito = null;
+  clearTimeout(cortarApito);
+
+  const som = document.getElementById("som");
+  som.pause();
+  som.currentTime = 0;
+
+}
+
+function controlarApito(){
+
+  if(proximoApito === null){
+
+    // bateu 20 minutos: alarme normal, inteiro
+    tocarApito(0);
+
+    const som = document.getElementById("som");
+    const duracao =
+      isFinite(som.duration) ? Math.ceil(som.duration) : 6;
+
+    proximoApito = segundos + duracao + PAUSA_APITO_SEG;
+    return;
+
+  }
+
+  if(segundos >= proximoApito){
+
+    tocarApito(APITO_CURTO_SEG);
+    proximoApito = segundos + APITO_CURTO_SEG + PAUSA_APITO_SEG;
+
+  }
+
+}
+
 function atualizarTimer(){
 
   if(pausado){
@@ -737,7 +826,7 @@ function atualizarTimer(){
   document.getElementById("timer").innerText =
     `${m}:${s}`;
 
-  if(segundos >= 1200){
+  if(segundos >= LIMITE_SEM_LIGACAO){
 
     document.getElementById("timer")
       .classList.add("alert");
@@ -745,7 +834,7 @@ function atualizarTimer(){
     document.getElementById("message").innerText =
       "⚠ SEM LIGAÇÕES HÁ 20 MINUTOS ⚠";
 
-    document.getElementById("som").play();
+    controlarApito();
 
   }
 
@@ -753,6 +842,8 @@ function atualizarTimer(){
 
     document.getElementById("timer")
       .classList.remove("alert");
+
+    pararApito();
 
   }
 
