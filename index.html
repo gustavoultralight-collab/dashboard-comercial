@@ -1015,6 +1015,11 @@ const PAUSA_APITO_SEG = 30;
 let proximoApito = null;
 let cortarApito = null;
 
+// Áudio 1: entra no lugar de UM dos 3 primeiros apitos curtos
+// (sorteado a cada vez que bate 20 minutos).
+let contagemApitos = 0;
+let apitoDaVoz = 0;
+
 function tocarApito(duracaoSeg){
 
   const som = document.getElementById("som");
@@ -1051,6 +1056,9 @@ function controlarApito(){
     // bateu 20 minutos: alarme normal, inteiro
     tocarApito(0);
 
+    contagemApitos = 0;
+    apitoDaVoz = 1 + Math.floor(Math.random()*3);
+
     const som = document.getElementById("som");
     const duracao =
       isFinite(som.duration) ? Math.ceil(som.duration) : 6;
@@ -1061,6 +1069,19 @@ function controlarApito(){
   }
 
   if(segundos >= proximoApito){
+
+    contagemApitos++;
+
+    if(contagemApitos === apitoDaVoz){
+
+      const duracaoVoz = tocarVoz(VOZES.semLigacao20);
+
+      if(duracaoVoz > 0){
+        proximoApito = segundos + Math.ceil(duracaoVoz) + PAUSA_APITO_SEG;
+        return;
+      }
+
+    }
 
     tocarApito(APITO_CURTO_SEG);
     proximoApito = segundos + APITO_CURTO_SEG + PAUSA_APITO_SEG;
@@ -1087,6 +1108,8 @@ function atualizarTimer(){
 
   document.getElementById("timer").innerText =
     `${m}:${s}`;
+
+  controlarVoz10min();
 
   if(segundos >= LIMITE_SEM_LIGACAO){
 
@@ -1315,7 +1338,190 @@ function inicializarSomVenda(){
 
   AUDIOS_ESPECIAIS_VENDA.forEach(regra => carregarAudio(regra.arquivo));
 
+  todasAsVozes().forEach(arquivo => carregarAudio(arquivo));
+
 }
+
+// === Áudios de voz (cobrança da equipe) ===
+//   1: depois de 20 min sem ligação, no lugar de um apito
+//   2 e 3: entre 10 e 19 min sem ligação, um dos dois, uma vez
+//   4 e 5: em horários fixos, se o Total de Vendas estiver baixo
+
+const VOZES = {
+  semLigacao20: "voz1-20min-sem-ligacao.ogg",
+  semLigacao10: ["voz2-10min-sem-ligacao.ogg", "voz3-10min-sem-ligacao.ogg"],
+  vendasBaixasManha: "voz4-vendas-baixas-manha.ogg",
+  totalBaixoTarde: "voz5-total-baixo-tarde.ogg"
+};
+
+// Avisos por horário: toca no horário se o Total de Vendas da
+// tela estiver ABAIXO do valor. Para mudar, é só editar aqui.
+const AVISOS_POR_HORARIO = [
+  { horarios:["10:00","11:30"], abaixoDe:20000, arquivo:VOZES.vendasBaixasManha },
+  { horarios:["14:00","16:00"], abaixoDe:5000,  arquivo:VOZES.totalBaixoTarde }
+];
+
+const INICIO_VOZ_10MIN = 600; // 10 minutos
+
+function todasAsVozes(){
+
+  return [
+    VOZES.semLigacao20,
+    ...VOZES.semLigacao10,
+    VOZES.vendasBaixasManha,
+    VOZES.totalBaixoTarde
+  ];
+
+}
+
+let vozOcupadaAte = 0;
+
+// Toca um áudio de voz. Devolve a duração em segundos,
+// ou 0 se não tocou (arquivo não carregou ou outra voz tocando).
+function tocarVoz(arquivo){
+
+  const buffer = buffersAudio[arquivo];
+
+  if(!audioCtxVenda || !buffer || Date.now() < vozOcupadaAte){
+    return 0;
+  }
+
+  if(audioCtxVenda.state === "suspended"){
+    audioCtxVenda.resume();
+  }
+
+  const fonte = audioCtxVenda.createBufferSource();
+  fonte.buffer = buffer;
+  fonte.connect(audioCtxVenda.destination);
+  fonte.start(0);
+
+  vozOcupadaAte = Date.now() + buffer.duration*1000 + 500;
+
+  return buffer.duration;
+
+}
+
+// Áudios 2 e 3: sorteia um momento entre 10:00 e 19:00 sem
+// ligação; quando chega nele, toca um dos dois (sorteado).
+let alvoVoz10min = null;
+let tocouVoz10min = false;
+
+function controlarVoz10min(){
+
+  if(segundos < INICIO_VOZ_10MIN){
+    alvoVoz10min = null;
+    tocouVoz10min = false;
+    return;
+  }
+
+  if(tocouVoz10min || segundos >= LIMITE_SEM_LIGACAO - 60){
+    return;
+  }
+
+  if(alvoVoz10min === null){
+    alvoVoz10min = INICIO_VOZ_10MIN +
+      Math.floor(Math.random()*(LIMITE_SEM_LIGACAO - 60 - INICIO_VOZ_10MIN));
+  }
+
+  if(segundos >= alvoVoz10min){
+
+    const lista = VOZES.semLigacao10;
+    const arquivo = lista[Math.floor(Math.random()*lista.length)];
+
+    if(tocarVoz(arquivo) > 0){
+      tocouVoz10min = true;
+    }
+
+  }
+
+}
+
+// Áudios 4 e 5: confere o relógio a cada 15 s. Cada horário toca
+// no máximo uma vez por dia (mesmo se a TV der F5), dentro de uma
+// janela de 5 minutos a partir do horário marcado.
+const CHAVE_AVISOS = "dashboardComercialAvisosHorario";
+
+function lerAvisosFeitos(){
+
+  try{
+    return JSON.parse(localStorage.getItem(CHAVE_AVISOS)) || {};
+  }catch(erro){
+    return {};
+  }
+
+}
+
+function marcarAvisoFeito(chave){
+
+  const feitos = lerAvisosFeitos();
+  feitos[chave] = true;
+
+  // guarda só os de hoje
+  const hoje = chave.slice(0,10);
+  for(let k in feitos){
+    if(!k.startsWith(hoje)){
+      delete feitos[k];
+    }
+  }
+
+  try{
+    localStorage.setItem(CHAVE_AVISOS, JSON.stringify(feitos));
+  }catch(erro){}
+
+}
+
+function totalVendasAtual(){
+
+  let soma = 0;
+
+  for(let n in vendas){
+    soma += vendas[n].valor;
+  }
+
+  return soma;
+
+}
+
+function verificarAvisosPorHorario(agora = new Date()){
+
+  const dia =
+    `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,"0")}-${String(agora.getDate()).padStart(2,"0")}`;
+
+  const minutoAgora = agora.getHours()*60 + agora.getMinutes();
+  const feitos = lerAvisosFeitos();
+
+  AVISOS_POR_HORARIO.forEach(aviso=>{
+
+    aviso.horarios.forEach(horario=>{
+
+      const [h, m] = horario.split(":").map(Number);
+      const minutoAviso = h*60 + m;
+      const chave = `${dia} ${horario}`;
+
+      if(feitos[chave]){
+        return;
+      }
+
+      if(minutoAgora < minutoAviso || minutoAgora >= minutoAviso + 5){
+        return;
+      }
+
+      if(totalVendasAtual() >= aviso.abaixoDe){
+        marcarAvisoFeito(chave); // vendas boas: não precisa cobrar
+        return;
+      }
+
+      if(tocarVoz(aviso.arquivo) > 0){
+        marcarAvisoFeito(chave);
+      }
+
+    });
+
+  });
+
+}
+
+setInterval(verificarAvisosPorHorario, 15000);
 
 function escolherSomVenda(nome, valor){
 
