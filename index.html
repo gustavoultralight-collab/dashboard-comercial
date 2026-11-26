@@ -234,6 +234,25 @@ outline:none;
   max-width:80%;
 }
 
+.botao-comemorar{
+  width:100%;
+  height:40px;
+  margin-top:15px;
+  font-size:18px;
+  background:#ffd700;
+  color:black;
+  border-radius:10px;
+}
+
+#confetes{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:1001;
+}
+
 .editor-vendas{
   position:fixed;
   inset:0;
@@ -511,6 +530,10 @@ outline:none;
 
       </table>
 
+      <button class="botao-comemorar" onclick="comemorarMeta()">
+        🎉 Comemorar meta
+      </button>
+
     </div>
 
   </div>
@@ -623,6 +646,8 @@ outline:none;
   <div class="venda-valor" id="vendaValor">R$ 0,00</div>
   <div class="venda-mensagem" id="vendaMensagem"></div>
 </div>
+
+<canvas id="confetes"></canvas>
 
 <div class="editor-vendas" id="editorVendas">
   <div class="editor-caixa">
@@ -1304,14 +1329,17 @@ const NTFY_TOPIC_VENDAS = "ultralight-vendas-c56ec50edb6b8ca0";
 let audioCtxVenda = null;
 
 const SOM_VENDA_PADRAO = "pwlpl-applause-sound-effect-521104.mp3";
+const SOM_COMEMORAR_META = "comemorar-meta.mp3";
 
 // Áudios especiais de venda: a primeira regra que bater toca
 // NO LUGAR do aplauso. Para criar outra, acrescente uma linha:
-//   nome      = consultor (igual ao do placar)
+//   nome      = consultor (igual ao do placar); sem nome = qualquer um
 //   abaixoDe  = toca quando a venda for MENOR que esse valor
-//   arquivo   = mp3 na mesma pasta do index.html
+//   acimaDe   = toca quando a venda for MAIOR que esse valor
+//   arquivo   = áudio na mesma pasta do index.html
 const AUDIOS_ESPECIAIS_VENDA = [
-  { nome:"Patrick", abaixoDe:200, arquivo:"venda-patrick-abaixo-200.mp3" }
+  { nome:"Patrick", abaixoDe:200, arquivo:"venda-patrick-abaixo-200.mp3" },
+  { acimaDe:10000, arquivo:"venda-acima-10mil.ogg" }
 ];
 
 let buffersAudio = {};
@@ -1335,6 +1363,7 @@ function inicializarSomVenda(){
   audioCtxVenda = new (window.AudioContext || window.webkitAudioContext)();
 
   carregarAudio(SOM_VENDA_PADRAO);
+  carregarAudio(SOM_COMEMORAR_META);
 
   AUDIOS_ESPECIAIS_VENDA.forEach(regra => carregarAudio(regra.arquivo));
 
@@ -1344,7 +1373,7 @@ function inicializarSomVenda(){
 
 // === Áudios de voz (cobrança da equipe) ===
 //   1: depois de 20 min sem ligação, no lugar de um apito
-//   2 e 3: entre 10 e 19 min sem ligação, um dos dois, uma vez
+//   2 e 3: entre 10 e 19 min sem ligação, um por vez, revezando
 //   4 e 5: em horários fixos, se o Total de Vendas estiver baixo
 
 const VOZES = {
@@ -1425,14 +1454,42 @@ function controlarVoz10min(){
 
   if(segundos >= alvoVoz10min){
 
+    // reveza: 2, 3, 2, 3... (a vez fica guardada, F5 não perde)
     const lista = VOZES.semLigacao10;
-    const arquivo = lista[Math.floor(Math.random()*lista.length)];
+    const vez = proximaVozDaVez() % lista.length;
 
-    if(tocarVoz(arquivo) > 0){
+    if(tocarVoz(lista[vez]) > 0){
       tocouVoz10min = true;
+      guardarVozDaVez(vez + 1);
     }
 
   }
+
+}
+
+const CHAVE_VEZ_VOZ10 = "dashboardComercialVezVoz10min";
+let vezVoz10Memoria = 0;
+
+function proximaVozDaVez(){
+
+  try{
+    const salvo = parseInt(localStorage.getItem(CHAVE_VEZ_VOZ10));
+    if(!isNaN(salvo)){
+      return salvo;
+    }
+  }catch(erro){}
+
+  return vezVoz10Memoria;
+
+}
+
+function guardarVozDaVez(vez){
+
+  vezVoz10Memoria = vez % VOZES.semLigacao10.length;
+
+  try{
+    localStorage.setItem(CHAVE_VEZ_VOZ10, String(vezVoz10Memoria));
+  }catch(erro){}
 
 }
 
@@ -1523,11 +1580,134 @@ function verificarAvisosPorHorario(agora = new Date()){
 
 setInterval(verificarAvisosPorHorario, 15000);
 
+// === Comemorar meta: confetes + música ===
+// Os confetes caem enquanto a música toca (mínimo 8 s).
+// Apertar de novo recomeça a festa do zero.
+
+let fonteComemoracao = null;
+let festaAte = 0;
+let confetes = [];
+let animandoConfetes = false;
+let ultimoQuadro = 0;
+
+const CORES_CONFETE = ["#00ff95","#ffd700","#ff3b6b","#3ba4ff","#ff8c00","#b46bff","#ffffff"];
+
+function comemorarMeta(){
+
+  let duracao = 8;
+  const buffer = buffersAudio[SOM_COMEMORAR_META];
+
+  if(audioCtxVenda && buffer){
+
+    if(audioCtxVenda.state === "suspended"){
+      audioCtxVenda.resume();
+    }
+
+    if(fonteComemoracao){
+      try{ fonteComemoracao.stop(); }catch(erro){}
+    }
+
+    fonteComemoracao = audioCtxVenda.createBufferSource();
+    fonteComemoracao.buffer = buffer;
+    fonteComemoracao.connect(audioCtxVenda.destination);
+    fonteComemoracao.start(0);
+
+    duracao = Math.max(duracao, buffer.duration);
+
+  }
+
+  festaAte = performance.now() + duracao*1000;
+
+  if(!animandoConfetes){
+    animandoConfetes = true;
+    ultimoQuadro = performance.now();
+    requestAnimationFrame(animarConfetes);
+  }
+
+}
+
+function novoConfete(largura, altura, deCima){
+
+  return {
+    x: Math.random()*largura,
+    y: deCima ? -20 - Math.random()*altura*0.3 : altura*(-0.5 + Math.random()*0.75),
+    w: 8 + Math.random()*8,
+    h: 12 + Math.random()*10,
+    vx: -1.5 + Math.random()*3,
+    vy: 2 + Math.random()*4,
+    giro: Math.random()*Math.PI*2,
+    vGiro: -0.2 + Math.random()*0.4,
+    balanco: Math.random()*Math.PI*2,
+    cor: CORES_CONFETE[Math.floor(Math.random()*CORES_CONFETE.length)]
+  };
+
+}
+
+function animarConfetes(agora){
+
+  const canvas = document.getElementById("confetes");
+  const ctx = canvas.getContext("2d");
+
+  if(canvas.width !== window.innerWidth || canvas.height !== window.innerHeight){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  const largura = canvas.width;
+  const altura = canvas.height;
+  const festaRolando = agora < festaAte;
+
+  // passo pelo tempo (1 = um quadro a 60 fps), para cair na
+  // mesma velocidade mesmo se a TV for mais lenta
+  const passo = Math.min(4, Math.max(0, (agora - ultimoQuadro)/16.67));
+  ultimoQuadro = agora;
+
+  // enquanto a música toca, vai soltando confete novo
+  if(festaRolando && confetes.length < 350){
+    const novos = confetes.length === 0 ? 200 : Math.ceil(6*passo);
+    const primeiraLeva = confetes.length === 0;
+    for(let i=0;i<novos;i++){
+      confetes.push(novoConfete(largura, altura, !primeiraLeva));
+    }
+  }
+
+  ctx.clearRect(0, 0, largura, altura);
+
+  confetes.forEach(c=>{
+
+    c.balanco += 0.05*passo;
+    c.x += (c.vx + Math.sin(c.balanco)*1.2)*passo;
+    c.y += c.vy*passo;
+    c.giro += c.vGiro*passo;
+
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.giro);
+    ctx.fillStyle = c.cor;
+    ctx.fillRect(-c.w/2, -c.h/2, c.w, c.h*Math.abs(Math.cos(c.giro)));
+    ctx.restore();
+
+  });
+
+  // tira os que já caíram
+  confetes = confetes.filter(c => c.y < altura + 30);
+
+  if(festaRolando || confetes.length > 0){
+    requestAnimationFrame(animarConfetes);
+  }else{
+    ctx.clearRect(0, 0, largura, altura);
+    animandoConfetes = false;
+  }
+
+}
+
 function escolherSomVenda(nome, valor){
 
   const regra = AUDIOS_ESPECIAIS_VENDA.find(r =>
-    r.nome === nome &&
-    (r.abaixoDe === undefined || valor < r.abaixoDe)
+    (r.nome === undefined || r.nome === nome) &&
+    (r.abaixoDe === undefined || valor < r.abaixoDe) &&
+    (r.acimaDe === undefined || valor > r.acimaDe) &&
+    buffersAudio[r.arquivo]
   );
 
   if(regra && buffersAudio[regra.arquivo]){
